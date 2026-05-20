@@ -39,35 +39,41 @@ git branch -M main
 echo.
 echo 🔍 Kiem tra GitHub CLI (gh)...
 where gh >nul 2>nul
-if %ERRORLEVEL% equ 0 (
-    echo ✅ Da tim thay GitHub CLI!
-    set /p repo_type="👉 Ban muon tao Repo [1] Public hay [2] Private? (1/2, mac dinh=2): "
-    set visibility=--private
-    if "%repo_type%"=="1" set visibility=--public
-    
-    echo ⏳ Dang tao repository tren GitHub...
-    gh repo create BrewCard_Batch_Updater %visibility% --source=. --remote=origin --push
-    echo ✅ Tao va day code len GitHub thanh cong!
-    
-    echo.
-    echo ⏳ Dang tao Tag va GitHub Release v1.0.0...
+if %ERRORLEVEL% equ 0 goto has_gh
+goto no_gh
+
+:has_gh
+echo ✅ Da tim thay GitHub CLI!
+set /p repo_type="👉 Ban muon tao Repo [1] Public hay [2] Private? (1/2, mac dinh=2): "
+set visibility=--private
+if "%repo_type%"=="1" set visibility=--public
+
+echo ⏳ Dang tao repository tren GitHub...
+gh repo create BrewCard_Batch_Updater %visibility% --source=. --remote=origin --push
+echo ✅ Tao va day code len GitHub thanh cong!
+
+echo.
+echo ⏳ Dang tao Tag va GitHub Release v1.0.0...
+git tag v1.0.0
+git push origin v1.0.0
+gh release create v1.0.0 --title "Initial Release v1.0.0" --notes "🚀 Khoi tao du an BrewCard_Batch_Updater bang AI Project Generator"
+echo ✅ Tao GitHub Release v1.0.0 thanh cong!
+goto end_script
+
+:no_gh
+echo ⚠️ KHONG tim thay GitHub CLI (gh). Ban nen cai dat de tu dong hoa buoc nay.
+echo 👉 Hay tao Repository moi tren trang GitHub cua ban (https://github.com/new)
+set /p repo_url="👉 Dan duong dan (URL) GitHub Repository vao day (hoac nhan Enter de bo qua): "
+if not "%repo_url%"=="" (
+    git remote add origin %repo_url%
+    git push -u origin main
+    echo ⏳ Dang tao Tag v1.0.0...
     git tag v1.0.0
     git push origin v1.0.0
-    gh release create v1.0.0 --title "Initial Release v1.0.0" --notes "🚀 Khoi tao du an BrewCard_Batch_Updater bang AI Project Generator"
-    echo ✅ Tao GitHub Release v1.0.0 thanh cong!
+    echo ✅ Day code va Tag thanh cong! Ban co the tao Release thu cong tren trang GitHub.
 ) else (
-    echo ⚠️ KHONG tim thay GitHub CLI (gh). Ban nen cai dat de tu dong hoa buoc nay.
-    echo 👉 Hay tao Repository moi tren trang GitHub cua ban (https://github.com/new)
-    set /p repo_url="👉 Dan duong dan (URL) GitHub Repository vao day (hoac nhan Enter de bo qua): "
-    if not "%repo_url%"=="" (
-        git remote add origin %repo_url%
-        git push -u origin main
-        echo ⏳ Dang tao Tag v1.0.0...
-        git tag v1.0.0
-        git push origin v1.0.0
-        echo ✅ Day code va Tag thanh cong! Ban co the tao Release thu cong tren trang GitHub.
-    ) else (
-        echo ❌ Ban chua nhap URL. Xin huy thao tac day code lan dau.
-    )
+    echo ❌ Ban chua nhap URL. Xin huy thao tac day code lan dau.
 )
+
+:end_script
 pause

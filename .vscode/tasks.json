@@ -1,0 +1,47 @@
+{
+    "version": "2.0.0",
+    "windows": {
+        "options": {
+            "shell": {
+                "executable": "cmd.exe",
+                "args": ["/d", "/c"]
+            }
+        }
+    },
+    "tasks": [
+        {
+            "label": "🛡️ Chạy Kiểm Tra Tự Động (Auto Checks)",
+            "type": "shell",
+            "command": "python auto_checks.py",
+            "problemMatcher": []
+        },
+        {
+            "label": "🚀 Build Executable (.exe)",
+            "type": "shell",
+            "command": "python build.py",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "🔍 Cập nhật Architecture (README.md)",
+            "type": "shell",
+            "command": "python scan_architecture.py",
+            "problemMatcher": []
+        },
+        {
+            "label": "🧪 Chạy Unit Test (pytest)",
+            "type": "shell",
+            "command": "pytest",
+            "problemMatcher": []
+        },
+        {
+            "label": "🔄 Sync to GitHub",
+            "type": "shell",
+            "command": "python auto_checks.py && git add . && git commit -m \"Auto sync\" && git push",
+            "problemMatcher": []
+        }
+    ]
+}

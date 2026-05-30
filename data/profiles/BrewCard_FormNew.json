@@ -1,0 +1,475 @@
+{
+    "target_file": {
+        "path": "G:/Tam Thuy/BrewCard_Batch_Updater/data/Dot Graph Syn from BrewCard 2026.xlsx",
+        "sheet_name": "Main"
+    },
+    "input_file": {
+        "sheet_name": ""
+    },
+    "input_filter": {
+        "type": "keyword",
+        "value": "Brew"
+    },
+    "header_row": "1-4",
+    "fingerprint": "D3=Order: & G3=Batch: & I3=Date:",
+    "fallback_profile": "BrewCard_FormOld",
+    "mappings": [
+        {
+            "target_col": "Batch",
+            "target_col_letter": "B",
+            "source_mapping": "H3",
+            "format_type": "🔤 Văn bản"
+        },
+        {
+            "target_col": "Day in",
+            "target_col_letter": "C",
+            "source_mapping": "J3",
+            "format_type": "📅 Ngày (dd/mm/yyyy)"
+        },
+        {
+            "target_col": "Time in",
+            "target_col_letter": "D",
+            "source_mapping": "F13",
+            "format_type": "⏰ Giờ (hh:mm)"
+        },
+        {
+            "target_col": "Time out",
+            "target_col_letter": "E",
+            "source_mapping": "G98",
+            "format_type": "⏰ Giờ (hh:mm)"
+        },
+        {
+            "target_col": "Malt Ratio - Y - %",
+            "target_col_letter": "F",
+            "source_mapping": "L15/E10*100",
+            "format_type": "📊 Phần trăm (0.00%)"
+        },
+        {
+            "target_col": "Mash-In Time - min",
+            "target_col_letter": "G",
+            "source_mapping": "I13+I14",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Grist/Water \nRatio",
+            "target_col_letter": "H",
+            "source_mapping": "(L9/(L15+E10))*10/100",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Gel Temp - Y - °C",
+            "target_col_letter": "I",
+            "source_mapping": "E20",
+            "format_type": "🧮 Số thập phân (1)"
+        },
+        {
+            "target_col": "Gel Time - min",
+            "target_col_letter": "J",
+            "source_mapping": "I20",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Boiling Time - min",
+            "target_col_letter": "L",
+            "source_mapping": "I22",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Cycle Duration - Y - min",
+            "target_col_letter": "N",
+            "source_mapping": "I33",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Mash-In Time - Y - min",
+            "target_col_letter": "O",
+            "source_mapping": "IF(F40>=F36,(F40-F36)*24*60,(1+F40-F36)*24*60)",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Mash-In End Temp - Y - °C",
+            "target_col_letter": "P",
+            "source_mapping": "L37",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Grist/Water \nRatio (1)",
+            "target_col_letter": "Q",
+            "source_mapping": "L8/E9*100",
+            "format_type": "🧮 Số thập phân (2)"
+        },
+        {
+            "target_col": "Protein Rest Temp - Y - °C",
+            "target_col_letter": "R",
+            "source_mapping": "E40",
+            "format_type": "🧮 Số thập phân (1)"
+        },
+        {
+            "target_col": "Protein Rest Time - Y - min",
+            "target_col_letter": "S",
+            "source_mapping": "I40",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Pump back Temp - Y - °C",
+            "target_col_letter": "T",
+            "source_mapping": "K41",
+            "format_type": "🧮 Số thập phân (1)"
+        },
+        {
+            "target_col": "Steam Usage Before Conversion - Kg",
+            "target_col_letter": "U",
+            "source_mapping": "K42",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Conversion Temp - °C",
+            "target_col_letter": "V",
+            "source_mapping": "E43",
+            "format_type": "🧮 Số thập phân (1)"
+        },
+        {
+            "target_col": "Conversion Time - min",
+            "target_col_letter": "W",
+            "source_mapping": "I43",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Mash off Temp - Y - °C",
+            "target_col_letter": "Z",
+            "source_mapping": "E46",
+            "format_type": "🧮 Số thập phân (1)"
+        },
+        {
+            "target_col": "Mash Tun Cycle Time - Y - min",
+            "target_col_letter": "AA",
+            "source_mapping": "I50",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Vorlauf Duration - min",
+            "target_col_letter": "AB",
+            "source_mapping": "I56",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Turbidity @Start Running - Y - EBC",
+            "target_col_letter": "AC",
+            "source_mapping": "E56",
+            "format_type": "🧮 Số thập phân (1)"
+        },
+        {
+            "target_col": "First Wort Extract - Y - Plato",
+            "target_col_letter": "AD",
+            "source_mapping": "L54",
+            "format_type": "🧮 Số thập phân (2)"
+        },
+        {
+            "target_col": "Last Hansel - Y - Plato",
+            "target_col_letter": "AE",
+            "source_mapping": "L62",
+            "format_type": "🧮 Số thập phân (2)"
+        },
+        {
+            "target_col": "Weak Wort Extract (Last Runnings) - Y - Plato",
+            "target_col_letter": "AF",
+            "source_mapping": "L63",
+            "format_type": "🧮 Số thập phân (2)"
+        },
+        {
+            "target_col": "Weak Wort  Volume - Y - HL",
+            "target_col_letter": "AG",
+            "source_mapping": "E60",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Deep Cut - Y",
+            "target_col_letter": "AH",
+            "source_mapping": "E59",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "First Wort Volume - Y - HL",
+            "target_col_letter": "AI",
+            "source_mapping": "E57",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Total Run off Volume - Y - HL",
+            "target_col_letter": "AJ",
+            "source_mapping": "E58",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Total Run off OG - Y - Plato",
+            "target_col_letter": "AK",
+            "source_mapping": "L59",
+            "format_type": "🧮 Số thập phân (2)"
+        },
+        {
+            "target_col": "First Wort/ Total Water Volume - Y - %",
+            "target_col_letter": "AL",
+            "source_mapping": "E57/(L8+L9+12)*100",
+            "format_type": "📊 Phần trăm (0.00%)"
+        },
+        {
+            "target_col": "First Wort/ Total Wort Volume - Y - %",
+            "target_col_letter": "AM",
+            "source_mapping": "E57/E58*100",
+            "format_type": "📊 Phần trăm (0.00%)"
+        },
+        {
+            "target_col": "Run off Time - Y - min",
+            "target_col_letter": "AO",
+            "source_mapping": "SUM(I57:I58)",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Lauter Tun Cycle Time - Y - min",
+            "target_col_letter": "AP",
+            "source_mapping": "I63",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Sparge Water Temp - Y - °C",
+            "target_col_letter": "AQ",
+            "source_mapping": "L55",
+            "format_type": "🧮 Số thập phân (1)"
+        },
+        {
+            "target_col": "SOB Volume - Y - HL",
+            "target_col_letter": "BG",
+            "source_mapping": "E71",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Filling Temp@\nBefore SOB - °C",
+            "target_col_letter": "BH",
+            "source_mapping": "L66",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Filling Temp@\nSOB-KF - Y - °C",
+            "target_col_letter": "BI",
+            "source_mapping": "L67",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Kettle Full Volume - HL",
+            "target_col_letter": "BJ",
+            "source_mapping": "E78",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Kettle Full Temp - °C",
+            "target_col_letter": "BK",
+            "source_mapping": "I77",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Boiling Time Before KF - Y - min",
+            "target_col_letter": "BM",
+            "source_mapping": "I71",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Boiling Time After KF - Y - min",
+            "target_col_letter": "BN",
+            "source_mapping": "SUM(I78,I80)",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Total Boiling Time - Y - min",
+            "target_col_letter": "BO",
+            "source_mapping": "SUM(I71,I78:I80)",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "1st Hops Addition - Time Before SOB - min",
+            "target_col_letter": "BS",
+            "source_mapping": "I74",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "2n Hops Addition - Time Before EOB - min",
+            "target_col_letter": "BT",
+            "source_mapping": "I75",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Evap % - KF to KO - Y - %",
+            "target_col_letter": "BV",
+            "source_mapping": "(E78-E83)/E78*100",
+            "format_type": "📊 Phần trăm (0.00%)"
+        },
+        {
+            "target_col": "Evap % - KF to KO\nDeviation - %",
+            "target_col_letter": "BW",
+            "source_mapping": "ABS(1-E83/E78-0.08)*100",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Total Evap % - MSB - %",
+            "target_col_letter": "BZ",
+            "source_mapping": "(E65-E97-10.5)/E65*100",
+            "format_type": "📊 Phần trăm (0.00%)"
+        },
+        {
+            "target_col": "Highest Temp - Y - °C",
+            "target_col_letter": "CB",
+            "source_mapping": "L77",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Steam Used - SOB-KO - Y - Kg",
+            "target_col_letter": "CG",
+            "source_mapping": "K85",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "KO Time - Y - min",
+            "target_col_letter": "CI",
+            "source_mapping": "I83",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Settling Time - Y - min",
+            "target_col_letter": "CJ",
+            "source_mapping": "I87",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Settling Overtime - Y - min",
+            "target_col_letter": "CK",
+            "source_mapping": "I87-10",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Wort Zinc - g/HL",
+            "target_col_letter": "CM",
+            "source_mapping": "D82/E97",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Cooling Time - Y - min",
+            "target_col_letter": "CN",
+            "source_mapping": "I97",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Cold Wort Temp - °C",
+            "target_col_letter": "CO",
+            "source_mapping": "L97",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Air Injection - Kg/Brew",
+            "target_col_letter": "CP",
+            "source_mapping": "E99",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Wort Aeration Mass Flow Rate - Y - g/HL",
+            "target_col_letter": "CQ",
+            "source_mapping": "(E99*1000)/E97",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Cold Wort Volume - Y - HL",
+            "target_col_letter": "CS",
+            "source_mapping": "E97",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Brewhouse Hot time - Y - min",
+            "target_col_letter": "CT",
+            "source_mapping": "IF(G97>=F57,(G97-F57)*24*60,(1+G97-F57)*24*60)",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Brewhouse Hot time\nDeviation - min",
+            "target_col_letter": "CU",
+            "source_mapping": "ABS(IF(G97>=F57,(G97-F57)*24*60-211,(1+G97-F57)*24*60-211))",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Total  Brewhouse cycle time - Y - min",
+            "target_col_letter": "CV",
+            "source_mapping": "I101*60",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Brewhouse cycle time\nDeviation - min",
+            "target_col_letter": "CW",
+            "source_mapping": "ABS(I101-5.95)*60",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Hot Severity Index - Y",
+            "target_col_letter": "CX",
+            "source_mapping": "L105",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Cold Wort OG -\nIn Line - Y - Plato",
+            "target_col_letter": "CY",
+            "source_mapping": "L95",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Cold Wort pH - \nIn Line - Y - Plato",
+            "target_col_letter": "CZ",
+            "source_mapping": "L96",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "start of wort draw-off",
+            "target_col_letter": "DC",
+            "source_mapping": "IF(F57>=F13,J3+F57,J3+1+F57)",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Start of Boiling time(SOB)",
+            "target_col_letter": "DD",
+            "source_mapping": "IF(F71>=F13,J3+F71,J3+1+F71)",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Kettle volume at Kettle full",
+            "target_col_letter": "DF",
+            "source_mapping": "E77",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "End of boiling time",
+            "target_col_letter": "DG",
+            "source_mapping": "IF(G79>=F13,J3+G79,J3+1+G79)",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Kettle volume at the end of boiling",
+            "target_col_letter": "DI",
+            "source_mapping": "E82",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "End of wort cooling",
+            "target_col_letter": "DJ",
+            "source_mapping": "IF(G96>=F13,J3+G96,J3+1+G96)",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Boiling Before or After KF?",
+            "target_col_letter": "BE",
+            "source_mapping": "BEFORE",
+            "format_type": "📝 Mặc định"
+        },
+        {
+            "target_col": "Boiling Type",
+            "target_col_letter": "BF",
+            "source_mapping": "MSB",
+            "format_type": "📝 Mặc định"
+        }
+    ],
+    "profile_name": "BrewCard_FormNew"
+}

@@ -9,6 +9,7 @@
 - **Quy tắc lập kế hoạch (Planning & WBS Rules)**:
   1. **Chi tiết hóa tối đa (Granularity)**: Tuyệt đối không sử dụng các gạch đầu dòng chung chung trong `PLAN.md` (VD: "Khởi tạo dự án", "Xây dựng Models", "Làm UI"). Bắt buộc phải phân rã công việc thành WBS (Work Breakdown Structure) chi tiết đến mức liệt kê rõ từng tệp tin (file), lớp (class), hàm (function), API endpoint, và thậm chí là **từng trường dữ liệu (field/attribute), kiểu dữ liệu (dtype nếu cần)** cụ thể cần tạo.
   2. **Hoàn thiện Thiết kế (Design First)**: Tuyệt đối không bước sang Giai đoạn Viết mã (Phase 2 - Development) nếu Giai đoạn Thiết kế (Phase 1) chưa hoàn thiện 100%. Phase 1 phải bao phủ đầy đủ: Luồng dữ liệu (Data Flow), Cấu trúc Database, API Contract, UI/UX Mockup, và các kịch bản ngoại lệ/dị thường (Edge Cases/Error Handling).
+  - **Spec & Planning (SOP)**: AI/Dev phải tham chiếu luồng `.agent-skills/.gemini/commands/spec.toml` (để lấy yêu cầu/vẽ spec) và `.agent-skills/.gemini/commands/planning.toml` (để phân rã task WBS/nghiệm thu) trong quá trình lập kế hoạch.
   3. **Đối chiếu chéo (Cross-Audit)**: Trước khi chốt Giai đoạn Thiết kế (Phase 1) để chuyển sang Giai đoạn Viết mã (Phase 2), bắt buộc phải thực hiện đối chiếu chéo 1:1. Mỗi "Yêu cầu cốt lõi" phải có ít nhất một task tương ứng trong WBS. Bắt buộc lập "Báo cáo Đối chiếu chéo" dạng bảng lưu trực tiếp vào tệp `PLAN.md` làm bằng chứng nghiệm thu thiết kế.
   4. **Lập Lộ trình thi công (Execution Roadmap)**: Sau khi đã hoàn tất Phase 1 (Thiết kế) và Phase 2 (WBS chi tiết), bắt buộc phải lập "Lộ trình thi công (TDD Execution Sequence)". Lộ trình này phải tuân thủ nghiêm ngặt phương pháp "Outside-In TDD" (Phát triển từ ngoài vào trong: Giao thức/UI -> Lõi nghiệp vụ -> Lưu trữ) để đảm bảo sản phẩm luôn bám sát trải nghiệm người dùng.
   5. **Quy tắc Zero-Bug (Thiết kế Phòng thủ Tuyệt đối)**: Bắt buộc áp dụng nguyên lý: *"Đào sâu, khoét vào từng điểm, bẻ gãy mọi rủi ro trên bản vẽ trước khi gõ bất kỳ dòng code nào"*. Trước khi code bất kỳ module nào, AI phải trình bày Báo cáo Phân tích Rủi ro (Tràn RAM, Bẫy trạng thái, Deadlock, Dữ liệu bẩn) và chờ Chủ nhà "Chốt phương án" (Sign-off) mới được phép thi công.
@@ -86,6 +87,7 @@ def calculate_area(radius: float) -> float:
   - *Tiền tố (Domain)*: `class_`, `student_`, `accounting_`...
   - *Hậu tố (Role)*: `_view.py` (Màn hình chính), `_tab.py` (Thẻ con), `_widget.py` (Thành phần UI), `_dialog.py` (Cửa sổ nổi).
   - *Ví dụ chuẩn*: `class_tab_planning.py`, `class_widget_links.py`.
+- **Code Refactoring & Simplification (SOP)**: Khi cần tối ưu hóa, dọn dẹp mã nguồn hoặc chia tách file lớn, AI phải kích hoạt luồng làm việc tại `.agent-skills/.gemini/commands/refactor.toml`. Nếu chỉ cần đơn giản hóa logic nội bộ, dùng `.agent-skills/.gemini/commands/code-simplify.toml`.
 - Thư mục `tests/` chứa unit test, file test đặt tên `test_<module>.py` tương ứng với file trong `src/`.
 
 ---
@@ -128,6 +130,7 @@ def calculate_area(radius: float) -> float:
   - **Bắt buộc**: Bất kỳ module hoặc function nào mới được tạo ra đều phải đi kèm với unit test tương ứng.
   - **Centralized Testing (Kiểm thử Tập trung - Cấu trúc Phẳng)**: Tuyệt đối KHÔNG đặt các file `test_*.py` nằm rải rác. BẮT BUỘC 100% các file test phải được lưu tập trung và đặt TRỰC TIẾP (cấu trúc phẳng) ngay bên trong thư mục `tests/` ở root dự án. KHÔNG tạo thêm các thư mục con bên trong `tests/` để dễ dàng quản lý và tránh rắc rối (VD: `tests/test_i18n_manager.py`).
   - **TDD linh hoạt**: Bắt buộc áp dụng TDD (Viết test trước, code sau) cho lớp Lõi nghiệp vụ (Services, Utils, Models). Riêng đối với lớp Giao diện (UI/Views), cho phép vẽ Code UI trước để chốt trải nghiệm, sau đó viết Unit Test ngay sau đó.
+  - **Prove-It Pattern (SOP)**: Khi bắt đầu phát triển tính năng mới hoặc vá lỗi (Bug Fix), AI/Kỹ sư bắt buộc phải kích hoạt quy trình tại `.agent-skills/.gemini/commands/test.toml` để tuân thủ luồng TDD (viết test thất bại trước -> sửa code -> test pass).
   - Không chấp nhận code logic (Service, Utils, Model) mà không có test.
   - Coverage tổng thể và cho từng file tối thiểu ≥ 80%.
   - **Bắt buộc chạy test (Auto-run tests)**: Ngay sau khi hoàn thành việc viết code cho một tính năng (feature), AI phải cung cấp sẵn lệnh shell (ví dụ: `pytest`) và yêu cầu người dùng (Chủ nhà) chạy thử, sau đó chờ nhận kết quả (Log) để xác nhận code hoạt động chính xác trước khi chuyển sang bước tiếp theo.
@@ -151,6 +154,7 @@ def test_calculate_area():
 - Mỗi module phải có README ngắn mô tả chức năng.
 - Cập nhật tài liệu kiến trúc (nếu có) khi thêm module/flow mới.
 - **Bảo toàn tài liệu (Content Preservation)**: Khi cập nhật tự động nội dung kiến trúc vào `README.md` (hoặc các file tài liệu khác), AI **bắt buộc** phải dựa vào các cờ đánh dấu (markers) như `<!-- ARCHITECTURE_START -->` và `<!-- ARCHITECTURE_END -->` để chỉ thay thế đúng phần nội dung ở giữa. Tuyệt đối không được ghi đè toàn bộ file làm mất các đoạn văn bản giải thích do người dùng tự viết.
+- **Documentation Workflow (SOP)**: Khi viết docstring, sinh tài liệu README hoặc comment giải thích logic, AI cần tham chiếu quy trình tại `.agent-skills/.gemini/commands/document.toml`.
 - Tài liệu API (Swagger/Postman hoặc file Markdown) phải luôn được cập nhật đồng bộ với code.
 
 ---
@@ -165,9 +169,11 @@ def test_calculate_area():
   - `feature/<tên-chức-năng>` (ví dụ: `feature/export-excel`)
   - `bugfix/<tên-lỗi>` (ví dụ: `bugfix/fix-null-pointer`)
   - `hotfix/<tên-lỗi-nghiêm-trọng>` cho các bản vá khẩn cấp cần đưa lên production ngay.
+- **Incremental Implementation (SOP)**: Trong quá trình phát triển, AI phải áp dụng vòng lặp phát triển tăng dần được quy định tại `.agent-skills/.gemini/commands/build.toml`. Tuyệt đối không nhảy cóc qua bước chạy Test và Build trước khi Commit.
 - **Pull Request / Merge Request**:
   - PR phải có mô tả rõ ràng (What, Why, How).
   - Khuyến khích squash các commit "rác" (như "fix typo", "update again") thành 1 commit có ý nghĩa trước khi merge.
+  - **5-Axis Code Review (SOP)**: Trước khi chốt mã nguồn hoặc tạo PR, AI bắt buộc phải tự review lại code dựa trên 5 trục tiêu chuẩn được định nghĩa tại `.agent-skills/.gemini/commands/review.toml`, sau đó phân loại cảnh báo theo mức độ.
 
 ---
 
@@ -188,6 +194,7 @@ def test_calculate_area():
   - **Bắt buộc**: Phải luôn tạo một kịch bản đóng gói chuyên dụng (ví dụ: `build.py`, `Makefile`, hoặc file `.spec` của PyInstaller) để quản lý quá trình build thay vì gõ lệnh CLI thủ công.
   - **Bảo trì và Đồng bộ**: Tệp kịch bản đóng gói này phải luôn được kiểm tra và cập nhật đồng bộ ngay lập tức mỗi khi có thay đổi trong mã nguồn ảnh hưởng đến quá trình đóng gói (ví dụ: thêm tệp tài nguyên tĩnh `assets`, bổ sung thư viện phụ thuộc ẩn, hoặc thay đổi tên Entry Point).
   - **Clean Build / Dọn dẹp trước khi đóng gói**: Trước khi thực thi lệnh PyInstaller, kịch bản build bắt buộc phải quét và xóa sạch các tệp/thư mục tạm (như `__pycache__`, thư mục `build/`, `dist/`, hoặc các file `.log` cũ) để đảm bảo tệp thực thi luôn là phiên bản tinh gọn nhất và không bị đóng gói nhầm mã nguồn cũ.
+- **Pre-launch Checklist (SOP)**: Trước khi chốt release bản build cuối cùng, AI bắt buộc phải kích hoạt luồng đánh giá đa trục tại `.agent-skills/.gemini/commands/ship.toml` để tổng hợp báo cáo Review, Security, Test Coverage và chốt quyết định GO/NO-GO.
 
 ---
 
@@ -210,6 +217,13 @@ Những nguyên tắc này được đúc kết từ các sự cố nghiêm tr�
   - *Nguyên tắc*: Tuyệt đối tuân thủ Kiến trúc Phân tầng. Không được phép nhồi nhét UI hoặc Logic của module này (VD: Làm giàu dữ liệu Sinh viên) vào bên trong module khác (VD: Quản lý Lớp học). Nếu một tệp vượt quá 500 dòng, bắt buộc dừng lại để chia tách (Refactor).
 - **Rải bẫy Đo lường Hiệu năng (Performance Trapping)**: 
   - *Nguyên tắc*: Đối với các tác vụ "nặng đô" (như đọc/ghi Excel lớn, gọi API), bắt buộc phải chèn các hàm ghi log thời gian thực (timestamps) tại các điểm nút (Milestones). Đề phòng trường hợp ứng dụng "chết lâm sàng" không văng Exception (Silent Crash), dòng log cuối cùng sẽ ngay lập tức chỉ điểm rò rỉ hiệu năng.
+- **Debugging & Troubleshooting (SOP)**: Khi ứng dụng gặp sự cố (Crash, Bug logic, Rò rỉ bộ nhớ), AI phải tuân thủ luồng khoanh vùng và phân tích lỗi được định nghĩa tại `.agent-skills/.gemini/commands/debug.toml`.
+- **Giới hạn của E2E Test & Rủi ro từ Batch Script (Testing Boundaries & Batch Traps)**:
+  - *Nguyên tắc*: Ngôn ngữ Batch (`.bat`) của Windows cực kỳ lỏng lẻo, rất dễ dính bẫy cú pháp (lỗi lồng khối `()`, lỗi `Delayed Expansion`). Tuyệt đối hạn chế viết logic rẽ nhánh phức tạp, gọi API bằng `.bat`. Ưu tiên dùng Python (`.py`) cho các kịch bản tự động hóa để tận dụng khả năng Unit Test. Nếu bắt buộc dùng `.bat`, hãy chia nhỏ bằng `goto` thay vì lồng khối quá sâu.
+  - *Kiểm thử*: Cảnh giác với "Điểm mù E2E": Hệ thống test E2E báo PASS khi file `.bat` được tạo ra trên ổ cứng KHÔNG đồng nghĩa với việc script đó chạy đúng. Các script tương tác với hạ tầng (Git, GitHub CLI, PyInstaller) bắt buộc phải có bước nghiệm thu thủ công (Manual QA) chạy thử thực tế cục bộ, không được tin tưởng mù quáng vào kết quả của test tự động tĩnh.
+- **Điểm mù E2E trong Xử lý Dữ liệu & Báo cáo (E2E Data Assertion)**:
+  - *Nguyên tắc*: Báo cáo PASS của E2E Test khi "chạy không văng lỗi" và "file xuất ra ổ cứng thành công" là một Ảo giác kiểm thử (Testing Illusion). Hệ thống test tĩnh không tự biết nội dung dữ liệu bên trong bị lệch dòng hay ghi đè.
+  - *Kiểm thử*: Đối với các luồng tổng hợp dữ liệu, xuất báo cáo (Excel, CSV), bài test E2E **bắt buộc phải có Data Assertion (Khẳng định Dữ liệu)**. Bài test phải mở file kết quả, đọc tọa độ cụ thể và assert tính chính xác (VD: Dữ liệu file A phải tiếp nối file B, tổng số dòng output phải bằng tổng các file input). Các logic nội tại như "tìm dòng trống tiếp theo" bắt buộc phải được tách thành hàm Pure Function và bảo vệ bằng Unit Test với các kịch bản chứa dữ liệu rác (Ghost Rows).
 
 ---
 
@@ -242,4 +256,20 @@ Những nguyên tắc này được đúc kết từ các sự cố nghiêm tr�
 - **Quy trình Chốt phiên (Session Closing)**:
     1. Cuối mỗi phiên làm việc, AI bắt buộc phải chủ động tổng hợp dữ liệu từ `PLAN.md` và thực hiện cập nhật vào `MASTER_BLUEPRINT.md` dựa trên cấu trúc đã định danh.
     2. Nếu có phát sinh mới, AI phải đề xuất bổ sung mục hoặc chèn vào vị trí logic nhất, đảm bảo `MASTER_BLUEPRINT.md` là "Living Documentation".
-- **Lệnh thực thi**: Người dùng có thể ra lệnh "Cập nhật Blueprint" bất cứ lúc nào, AI phải thực hiện rà soát và đồng bộ hóa dựa trên lịch sử hội thoại gần nhất.
+- **Lệnh thực thi**: Người dùng có thể ra lệnh "Cập nhật Blueprint" bất cứ lúc nào, AI phải thực h iện rà soát và đồng bộ hóa dựa trên lịch sử hội thoại gần nhất.
+
+---
+
+## 13. Agent Skills Delegation (Sổ tay Quy trình Thực thi)
+- **Định hướng**: Mọi quy trình thực thi chi tiết (Workflows/SOPs) của AI Agent được quản lý tập trung tại thư mục `.agent-skills/.gemini/commands/`. `AI_RULES.md` đóng vai trò "Hiến pháp" định hướng, các file `.toml` là cẩm nang hướng dẫn hành động cụ thể.
+- **Danh mục Skills (Con trỏ)**:
+    1. **`test.toml` (TDD & Prove-It)**: Sử dụng khi vá lỗi hoặc làm tính năng mới để đảm bảo có test case thất bại trước khi viết code.
+    2. **`build.toml` (Incremental Implementation)**: Sử dụng để chạy vòng lặp thi công tăng dần (Test -> Code -> Verify -> Commit).
+    3. **`review.toml` (5-Axis Review)**: Sử dụng trước khi chốt tính năng để quét mã nguồn trên 5 trục: Correctness, Readability, Architecture, Security, Performance.
+    4. **`document.toml` (Documentation)**: Sử dụng để sinh docstring, viết tài liệu README, API docs chuẩn mực.
+    5. **`refactor.toml` (Code Refactoring)**: Sử dụng khi cần tối ưu hóa, dọn dẹp mã nguồn, hoặc chia tách các file vượt quá 500 dòng.
+    6. **`debug.toml` (Debugging & Fixes)**: Sử dụng để phân tích nguyên nhân gốc rễ (Root Cause Analysis) và vá các lỗi phức tạp trong hệ thống.
+    7. **`spec.toml` (Spec-Driven)**: Sử dụng ở Phase 1 để lấy yêu cầu, định nghĩa phạm vi, cấu trúc và ranh giới hệ thống trước khi gõ code.
+    8. **`planning.toml` (Task Breakdown)**: Sử dụng để phân rã spec thành các task nhỏ (WBS) có Acceptance Criteria để thi công.
+    9. **`code-simplify.toml` (Code Simplification)**: Sử dụng để đơn giản hóa logic, giảm độ phức tạp của hàm/lớp mà không thay đổi hành vi.
+    10. **`ship.toml` (Shipping & Pre-launch)**: Trình quản lý đa đặc vụ (Orchestrator) chạy các bài kiểm tra song song (Code Review, Security, Test) để chốt quyết định Release.

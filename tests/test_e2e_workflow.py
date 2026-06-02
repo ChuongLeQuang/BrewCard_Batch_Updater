@@ -25,28 +25,28 @@ def sandbox_env(tmp_path):
     VI: Thiết lập môi trường hộp cát với các file mẫu thật của người dùng.
     """
     test_data_dir = os.path.join(os.path.dirname(__file__), "test_data")
-    mock_master_src = os.path.join(test_data_dir, "mock_master.xlsx")
-    mock_clean_src = os.path.join(test_data_dir, "mock_input_clean.xlsx")
-    mock_dirty_src = os.path.join(test_data_dir, "mock_input_dirty.xlsx")
+    files = {
+        "master": "mock_master.xlsx",
+        "clean": "mock_input_clean.xlsx",
+        "dirty": "mock_input_dirty.xlsx",
+        "update": "mock_input_clean_update.xlsx",
+        "complex": "mock_input_complex_formulas.xlsx",
+        "wrong_form": "mock_input_dirty_wrong_form.xlsx",
+    }
 
-    if (
-        not os.path.exists(mock_master_src)
-        or not os.path.exists(mock_clean_src)
-        or not os.path.exists(mock_dirty_src)
-    ):
-        pytest.skip(
-            "Thiếu file dữ liệu mẫu (mock_master.xlsx, mock_input_clean.xlsx, mock_input_dirty.xlsx). Vui lòng chạy script generate_mocks.py."
-        )
+    paths = {}
+    for key, filename in files.items():
+        src = os.path.join(test_data_dir, filename)
+        if not os.path.exists(src):
+            pytest.skip(
+                f"Thiếu file dữ liệu mẫu ({filename}). Vui lòng chạy script generate_mocks.py."
+            )
 
-    sandbox_master = tmp_path / "mock_master.xlsx"
-    sandbox_clean = tmp_path / "mock_input_clean.xlsx"
-    sandbox_dirty = tmp_path / "mock_input_dirty.xlsx"
+        dst = tmp_path / filename
+        shutil.copy2(src, dst)
+        paths[key] = str(dst)
 
-    shutil.copy2(mock_master_src, sandbox_master)
-    shutil.copy2(mock_clean_src, sandbox_clean)
-    shutil.copy2(mock_dirty_src, sandbox_dirty)
-
-    return sandbox_master, sandbox_clean, sandbox_dirty
+    return paths
 
 
 def test_e2e_happy_path(sandbox_env):
@@ -54,7 +54,8 @@ def test_e2e_happy_path(sandbox_env):
     EN: Test Happy Path (Clean Data).
     VI: Kiểm thử luồng dữ liệu sạch (Happy Path), không có lỗi.
     """
-    sandbox_master, sandbox_clean, _ = sandbox_env
+    sandbox_master = sandbox_env["master"]
+    sandbox_clean = sandbox_env["clean"]
 
     config = AppConfig()
     config.data["target_file"]["path"] = str(sandbox_master)
@@ -155,7 +156,8 @@ def test_e2e_dirty_path(sandbox_env):
     EN: Test Dirty Path (Error Data).
     VI: Kiểm thử luồng dữ liệu lỗi (Dirty Path). Hệ thống PHẢI TỪ CHỐI ghi.
     """
-    sandbox_master, _, sandbox_dirty = sandbox_env
+    sandbox_master = sandbox_env["master"]
+    sandbox_dirty = sandbox_env["dirty"]
 
     config = AppConfig()
     config.data["target_file"]["path"] = str(sandbox_master)
@@ -240,3 +242,121 @@ def test_e2e_import_formulas_from_excel(tmp_path):
 
     assert len(pending) == 1
     assert pending[0] == ("Unknown Column", "A1+B1")  # Đẩy vào Hộp thoại chờ
+
+
+def test_e2e_update_overwrite(sandbox_env):
+    """
+    EN: Test updating/overwriting an existing batch record.
+    VI: Kiểm thử luồng Ghi đè cập nhật mẻ nấu đã tồn tại.
+    """
+    sandbox_master = sandbox_env["master"]
+    sandbox_update = sandbox_env["update"]
+
+    config = AppConfig()
+    config.data["target_file"]["path"] = sandbox_master
+    # Cố tình set mapping trỏ đúng vào Cột A (Số lô) để test
+    config.data["mappings"] = [
+        {
+            "target_col": "Batch Number",
+            "target_col_letter": "A",
+            "source_mapping": "H3",
+            "format_type": "General",
+        },
+        {
+            "target_col": "Grist/Water Ratio",
+            "target_col_letter": "B",
+            "source_mapping": "E10",
+            "format_type": "General",
+        },
+    ]
+
+    is_valid, errors, extracted = scan_file_qc(sandbox_update, config)
+    assert is_valid is True, f"QC thất bại: {errors}"
+
+    records = [BrewRecord(batch_number=str(d.get("A", "")), data=d) for d in extracted]
+    engine = BrewSyncEngine(config)
+    success = engine.sync_records(records)
+
+    assert success is True
+
+    wb = openpyxl.load_workbook(sandbox_master, data_only=True)
+    ws = wb[config.data["target_file"]["sheet_name"]]
+
+    # File Master ban đầu có 1 Header + 1 Dòng dữ liệu (Lô B9999).
+    # File Update cũng chứa lô B9999. Do đó max_row vẫn chỉ được phép là 2 (Không chèn dòng mới).
+    assert (
+        ws.max_row == 2
+    ), "Lỗi nghiêm trọng: Hệ thống đẻ thêm dòng mới thay vì ghi đè dòng cũ!"
+
+    # Kiểm tra xem dữ liệu có thực sự được cập nhật chưa
+    assert ws["A2"].value == "B9999"
+    assert ws["B2"].value == 200.0  # Giá trị E10 mới từ mock_input_clean_update
+    wb.close()
+
+
+def test_e2e_complex_formulas(sandbox_env):
+    """
+    EN: Test parsing and calculating complex AST formulas.
+    VI: Kiểm thử việc phân dịch các công thức phức tạp qua AST.
+    """
+    sandbox_complex = sandbox_env["complex"]
+
+    config = AppConfig()
+    config.data["mappings"] = [
+        {
+            "target_col": "Batch",
+            "target_col_letter": "A",
+            "source_mapping": "H3",
+            "format_type": "General",
+        },
+        {
+            "target_col": "Result IF",
+            "target_col_letter": "B",
+            "source_mapping": "IF(A1>B1, 20%, 10%)",
+            "format_type": "General",
+        },
+        {
+            "target_col": "Result AVG",
+            "target_col_letter": "C",
+            "source_mapping": "AVERAGE(A1, B1)",
+            "format_type": "General",
+        },
+        {
+            "target_col": "Result CONCAT",
+            "target_col_letter": "D",
+            "source_mapping": 'CONCATENATE("LOT-", H3)',
+            "format_type": "General",
+        },
+    ]
+
+    is_valid, errors, extracted = scan_file_qc(sandbox_complex, config)
+    assert is_valid is True, f"Lỗi dịch công thức AST: {errors}"
+    assert len(extracted) == 1
+
+    data = extracted[0]
+    assert data["A"] == "1002"
+    assert data["B"] == 0.2  # =IF(A1>B1, 20%, 10%) với A1=100, B1=50
+    assert data["C"] == 75.0  # =AVERAGE(A1, B1) với A1=100, B1=50
+    assert data["D"] == "LOT-1002"  # =CONCATENATE("LOT-", H3) với H3=1002
+
+
+def test_e2e_wrong_fingerprint(sandbox_env):
+    """
+    EN: Test rejection of files that do not match the fingerprint.
+    VI: Kiểm thử việc từ chối các file không khớp dấu vân tay nhận diện.
+    """
+    sandbox_wrong = sandbox_env["wrong_form"]
+
+    config = AppConfig()
+    config.data["fingerprint"] = "D3=Order: & G3=Batch:"
+
+    is_valid, errors, extracted = scan_file_qc(sandbox_wrong, config)
+
+    assert is_valid is False
+    assert len(extracted) == 0
+    assert any(
+        "không khớp" in err.lower()
+        or "vân tay" in err.lower()
+        or "biểu mẫu" in err.lower()
+        for err in errors
+    ), "File sai biểu mẫu nhưng không bị báo lỗi vân tay!"

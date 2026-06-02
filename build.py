@@ -200,7 +200,12 @@ def build_app() -> None:
             from PIL import Image
 
             img = Image.open(icon_path_png)
-            img.save(icon_path_ico, format="ICO")
+            # Tạo file .ico chứa nhiều độ phân giải để Windows hiển thị sắc nét ở mọi kích cỡ
+            img.save(
+                icon_path_ico,
+                format="ICO",
+                sizes=[(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)],
+            )
             logging.info("🎨 Đã tự động chuyển đổi icon.png sang icon.ico thành công!")
         except ImportError:
             logging.warning(

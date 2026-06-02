@@ -193,6 +193,11 @@ Bộ phân dịch `ExcelFormulaEvaluator` sẽ tuân thủ các quy tắc sau:
     - [x] **17.3 (Dirty Path)**: Viết kịch bản `test_e2e_dirty_path`, ép hệ thống chạy file `dirty`, kiểm chứng hệ thống PHẢI ném ra đúng các cảnh báo `#DIV/0!` hoặc `#VALUE!` và vẫn ghi file thành công mà không sập.
     - [x] **17.4 (Smart Import)**: Bổ sung kiểm thử E2E cho luồng Nạp Công thức tự động từ file Excel.
 
+**Giai đoạn 7: Hoàn thiện trải nghiệm (Polishing & Finalizing)**
+*   **Bước 18: Tinh chỉnh Giao diện cuối cùng**
+    - [x] **18.1**: Bổ sung nút ❌ xóa dòng trực tiếp trên bảng Mappings.
+    - [x] **18.2**: Tích hợp Icon hiển thị lên thanh tiêu đề (Title Bar) và Taskbar của hệ điều hành.
+
 ---
 
 ## 📝 Nhật ký (Changelog)

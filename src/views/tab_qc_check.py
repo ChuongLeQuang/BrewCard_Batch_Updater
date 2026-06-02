@@ -269,10 +269,19 @@ class TabQCCheck(QWidget):
             )
             return
 
-        file_sheets_map = {
-            path: self.file_sheet_data.get(path, {}).get("selected", [])
-            for path in file_paths
-        }
+        config = AppConfig()
+        fallback_name = config.data.get("fallback_profile")
+        if fallback_name:
+            fallback_config = AppConfig(fallback_name)
+            if not fallback_config.data.get("fingerprint", "").strip():
+                QMessageBox.critical(
+                    self,
+                    "Lỗi Bảo mật Dữ liệu",
+                    f"Hồ sơ dự phòng '{fallback_name}' đang KHÔNG CÓ Dấu vân tay!\n\n"
+                    f"Nếu bỏ qua, mọi file rác sẽ chui lọt vào hệ thống thông qua lỗ hổng này.\n"
+                    f"Vui lòng quay lại Tab Cấu hình, mở Profile '{fallback_name}' lên và cài đặt Dấu hiệu nhận diện cho nó trước.",
+                )
+                return
 
         self.btn_start_scan.setEnabled(False)
         self.btn_clear_list.setEnabled(False)
@@ -281,7 +290,10 @@ class TabQCCheck(QWidget):
         self.valid_records.clear()
         self.error_map.clear()
 
-        config = AppConfig()
+        file_sheets_map = {
+            path: self.file_sheet_data.get(path, {}).get("selected", [])
+            for path in file_paths
+        }
         self.qc_worker = QCWorker(file_sheets_map, config)
         self.qc_worker.progress_update.connect(self._update_progress)
         self.qc_worker.file_processed.connect(self._update_file_status)

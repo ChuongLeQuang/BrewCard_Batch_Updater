@@ -57,10 +57,12 @@ Nếu bạn đã khởi tạo kèm `.venv`, hãy kích hoạt nó bằng lệnh 
         ┣ 📂 workflows
             ┣ 📜 build.yml
     ┣ 📂 assets
-        ┣ 📜 icon.png
+        ┣ 📜 icon0.png
         ┣ 📜 icon1.png
         ┣ 📜 icon3.png
         ┣ 📜 icon4.png
+        ┣ 📜 icon.ico
+        ┣ 📜 icon.png
     ┣ 📂 data
         ┣ 📜 Dot Graph Syn from BrewCard 2026.xlsx
         ┣ 📜 app_settings.json
@@ -108,6 +110,7 @@ Nếu bạn đã khởi tạo kèm `.venv`, hãy kích hoạt nó bằng lệnh 
             ┣ 📜 widget_noscroll_combobox.py
             ┣ 📜 config_dialog_alias.py
             ┣ 📜 dialog_column_selector.py
+            ┣ 📜 __init__.py
     ┣ 📂 tests
         ┣ 📜 test_BrewCard_Batch_Updater.py
         ┣ 📜 test_excel_services.py
@@ -116,10 +119,13 @@ Nếu bạn đã khởi tạo kèm `.venv`, hãy kích hoạt nó bằng lệnh 
         ┣ 📜 test_alias_memory.py
         ┣ 📜 test_e2e_workflow.py
         ┣ 📂 test_data
-            ┣ 📜 mock_master.xlsx
             ┣ 📜 mock_input_batch.xlsx
             ┣ 📜 mock_input_clean.xlsx
             ┣ 📜 mock_input_dirty.xlsx
+            ┣ 📜 mock_input_clean_update.xlsx
+            ┣ 📜 mock_input_complex_formulas.xlsx
+            ┣ 📜 mock_input_dirty_wrong_form.xlsx
+            ┣ 📜 mock_master.xlsx
     ┣ 📂 .pytest_cache
         ┣ 📜 README.md
         ┣ 📜 .gitignore
@@ -492,6 +498,8 @@ Phần này trích xuất tự động thông tin về Đầu vào (Inputs) và 
     > Chưa có mô tả.
   - **`def _add_mapping_row(target_col: str, target_letter: str, source_mapping: str, format_type: str, scroll_to_bottom: bool) -> Any`**
     > Chưa có mô tả.
+  - **`def _delete_mapping_row(btn: QPushButton) -> Any`**
+    > Chưa có mô tả.
   - **`def _open_excel_mockup() -> Any`**
     > Chưa có mô tả.
   - **`def _import_formulas_from_file() -> Any`**
@@ -738,6 +746,18 @@ Phần này trích xuất tự động thông tin về Đầu vào (Inputs) và 
 - **`def test_e2e_import_formulas_from_excel(tmp_path) -> Any`**
   > EN: E2E test for extracting and processing formulas from a real Excel file.
   > VI: Kiểm thử E2E cho việc trích xuất và xử lý công thức từ file Excel thật.
+
+- **`def test_e2e_update_overwrite(sandbox_env) -> Any`**
+  > EN: Test updating/overwriting an existing batch record.
+  > VI: Kiểm thử luồng Ghi đè cập nhật mẻ nấu đã tồn tại.
+
+- **`def test_e2e_complex_formulas(sandbox_env) -> Any`**
+  > EN: Test parsing and calculating complex AST formulas.
+  > VI: Kiểm thử việc phân dịch các công thức phức tạp qua AST.
+
+- **`def test_e2e_wrong_fingerprint(sandbox_env) -> Any`**
+  > EN: Test rejection of files that do not match the fingerprint.
+  > VI: Kiểm thử việc từ chối các file không khớp dấu vân tay nhận diện.
 
 
 #### 📄 `tests/test_excel_services.py`

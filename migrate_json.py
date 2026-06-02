@@ -22,7 +22,7 @@ def guess_format(name: str) -> str:
     if "min" in nl:
         return "🔢 Số nguyên"
     if "time in" in nl or "time out" in nl or "start of" in nl or "end of" in nl:
-        return "⏰ Giờ (hh:mm)"
+        return "⏰ Ngày & Giờ (dd/mm/yyyy hh:mm)"
     if "day" in nl or "date" in nl:
         return "📅 Ngày (dd/mm/yyyy)"
     return "📝 Mặc định"

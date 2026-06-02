@@ -30,5 +30,5 @@ FORMAT_OPTIONS = {
     "📊 Phần trăm (0%)": "0%",
     "📊 Phần trăm (0.00%)": "0.00%",
     "📅 Ngày (dd/mm/yyyy)": "dd/mm/yyyy",
-    "⏰ Giờ (hh:mm)": "hh:mm",
+    "⏰ Ngày & Giờ (dd/mm/yyyy hh:mm)": "dd/mm/yyyy hh:mm",
 }

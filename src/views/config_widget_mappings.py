@@ -47,13 +47,14 @@ class ConfigWidgetMappings(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
 
         layout.addWidget(QLabel("Bản đồ ánh xạ dữ liệu (Mappings):", self))
-        self.tbl_mappings = QTableWidget(0, 4, self)
+        self.tbl_mappings = QTableWidget(0, 5, self)
         self.tbl_mappings.setHorizontalHeaderLabels(
             [
                 "Cột đích (Chữ cái)",
                 "Tên Cột đích (Tự động)",
                 "Nguồn lấy dữ liệu / Công thức Excel",
                 "Định dạng hiển thị",
+                "Xóa",
             ]
         )
 
@@ -64,11 +65,15 @@ class ConfigWidgetMappings(QWidget):
         header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
         header.setSectionResizeMode(3, QHeaderView.ResizeMode.Interactive)
         self.tbl_mappings.setColumnWidth(3, 180)
+        header.setSectionResizeMode(4, QHeaderView.ResizeMode.Fixed)
+        self.tbl_mappings.setColumnWidth(4, 40)
         layout.addWidget(self.tbl_mappings)
 
         h_btns = QHBoxLayout()
         btn_add = QPushButton("➕ Thêm dòng ánh xạ", self)
-        btn_add.clicked.connect(lambda: self._add_mapping_row("", "", "", True))
+        btn_add.clicked.connect(
+            lambda: self._add_mapping_row("", "", "", scroll_to_bottom=True)
+        )
         btn_pick = QPushButton("🎯 Mở Excel ảo chọn Ô", self)
         btn_pick.clicked.connect(self._open_excel_mockup)
         btn_import = QPushButton("🔄 Nạp Công thức từ File...", self)
@@ -159,6 +164,13 @@ class ConfigWidgetMappings(QWidget):
             format_cmb.setCurrentIndex(0)
         self.tbl_mappings.setCellWidget(row, 3, format_cmb)
 
+        btn_delete = QPushButton("❌", self)
+        btn_delete.setStyleSheet(
+            "color: red; border: none; font-size: 14px; padding: 2px;"
+        )
+        btn_delete.clicked.connect(lambda _, b=btn_delete: self._delete_mapping_row(b))
+        self.tbl_mappings.setCellWidget(row, 4, btn_delete)
+
         cmb.currentTextChanged.connect(
             lambda text, c=cmb: self._update_target_name_by_cmb(c, text)
         )
@@ -169,6 +181,12 @@ class ConfigWidgetMappings(QWidget):
                 self._update_target_name(row, target_letter)
         if scroll_to_bottom:
             self.tbl_mappings.scrollToBottom()
+
+    def _delete_mapping_row(self, btn: QPushButton):
+        for row in range(self.tbl_mappings.rowCount()):
+            if self.tbl_mappings.cellWidget(row, 4) == btn:
+                self.tbl_mappings.removeRow(row)
+                break
 
     def _open_excel_mockup(self):
         dialog = WidgetExcelMockup(self)
@@ -286,7 +304,7 @@ class ConfigWidgetMappings(QWidget):
                     or "start of" in nl
                     or "end of" in nl
                 ):
-                    fmt = "⏰ Giờ (hh:mm)"
+                    fmt = "⏰ Ngày & Giờ (dd/mm/yyyy hh:mm)"
                 elif "day" in nl or "date" in nl:
                     fmt = "📅 Ngày (dd/mm/yyyy)"
 

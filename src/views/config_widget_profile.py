@@ -114,7 +114,12 @@ class ConfigWidgetProfile(QWidget):
         layout_input.addLayout(h_fp1)
 
         h_fp2 = QHBoxLayout()
-        h_fp2.addWidget(QLabel("🔄 Nếu không khớp, tự động dùng Form dự phòng:", self))
+        h_fp2.addWidget(
+            QLabel(
+                "🔄 Nếu không khớp, thử kiểm tra bằng Form dự phòng (phải có Vân tay riêng):",
+                self,
+            )
+        )
         self.cmb_fallback_profile = QComboBox(self)
         h_fp2.addWidget(self.cmb_fallback_profile, stretch=1)
         layout_input.addLayout(h_fp2)
@@ -152,11 +157,11 @@ class ConfigWidgetProfile(QWidget):
 
         if fallback_prof and fallback_prof != current_prof:
             self.lbl_chain_preview.setText(
-                f"👉 Luồng quét: Kiểm tra [{current_prof}] ➡️ (Nếu sai) ➡️ Chuyển sang [{fallback_prof}]"
+                f"👉 Luồng: Khớp vân tay [{current_prof}] ➡️ (Nếu sai) ➡️ Thử khớp vân tay [{fallback_prof}] ➡️ (Nếu vẫn sai) ➡️ ❌ Bỏ qua (Rác)"
             )
         else:
             self.lbl_chain_preview.setText(
-                f"👉 Luồng quét: Kiểm tra [{current_prof}] ➡️ (Nếu sai) ➡️ ❌ Báo Lỗi Ngay"
+                f"👉 Luồng: Khớp vân tay [{current_prof}] ➡️ (Nếu sai) ➡️ ❌ Bỏ qua (Sheet rác)"
             )
 
     @retry_io(retries=3, delay=1.0)

@@ -59,9 +59,18 @@ class GuideDialog(QDialog):
         html_content = f"""
         <h2 style='color: #2A82DA;'>1. HƯỚNG DẪN TỪNG PHÂN HỆ (TABS)</h2>
         <ul>
-            <li><b>⚙️ Tab Cấu hình Hệ thống:</b> Chỉ làm 1 lần (hoặc khi có biểu mẫu mới). Tại đây bạn chọn File tổng (Master), điền tên Sheet của các file con, và vẽ bản đồ kết nối dữ liệu (Mappings) bằng cách điền chữ cái Cột Đích và Tọa độ Ô nguồn. Hỗ trợ lưu nhiều Cấu hình (Profile) khác nhau.</li>
-            <li><b>📥 Tab Kiểm tra Chất lượng (QC):</b> Công việc hằng ngày. Bạn kéo thả hàng chục file Excel (mẻ nấu) vào đây. Phần mềm sẽ tự động quét lỗi, cảnh báo file bị thiếu dữ liệu, sai định dạng trước khi gộp.</li>
-            <li><b>🚀 Tab Tổng hợp Dữ liệu:</b> Chạy gộp dữ liệu. Phần mềm tự đối chiếu Số lô (Batch), nếu trùng sẽ ghi đè cập nhật, nếu mới sẽ thêm dòng xuống dưới cùng.</li>
+            <li style='margin-bottom: 8px;'><b>⚙️ Tab Cấu hình Hệ thống:</b> Chỉ làm 1 lần (hoặc khi có biểu mẫu mới). Tại đây bạn thiết lập các thông số:
+                <ul style='margin-top: 4px;'>
+                    <li><b>File tổng (Master):</b> Nơi dữ liệu sẽ được gom vào.</li>
+                    <li><b>Tên Sheet lấy dữ liệu:</b> Nếu để trống, phần mềm sẽ quét <b>tất cả</b> các sheet có trong file con. Tiện lợi nhưng dễ quét nhầm vào các sheet rác.</li>
+                    <li><b>Dấu hiệu nhận diện (Vân tay):</b> ⚠️ <b>CỰC KỲ QUAN TRỌNG!</b> Đây là "màng lọc" tự động để phân biệt sheet chứa dữ liệu thật và sheet rác. Bạn chọn một ô luôn có nội dung cố định để làm mốc (VD: <code>G3=Batch:</code>). Phần mềm sẽ kiểm tra ô G3, nếu chứa chữ "Batch:", nó mới lấy số liệu; nếu không, nó bỏ qua sheet đó để bảo vệ an toàn dữ liệu.<br>
+                    <i>*Lưu ý: Nếu khai báo sai vân tay, phần mềm sẽ bỏ qua luôn cả sheet đúng. Có thể ghép nhiều điều kiện bằng dấu <code>&</code> (VD: <code>D3=Order: & G3=Batch:</code>).</i><br>
+                    <i><b>*Mẹo sử dụng Form dự phòng:</b> Nếu công ty bạn dùng 2 biểu mẫu khác nhau (Form Mới và Form Cũ), hãy tạo 2 Profile với 2 Vân tay khác nhau. Ở Form chính, chọn "Form dự phòng" trỏ về Form phụ. Phần mềm sẽ tự động thử chìa khóa vân tay của cả 2 Form để nhận diện, nếu không khớp cả 2 thì nó mới kết luận đó là Sheet rác.</i></li>
+                    <li><b>Bản đồ dữ liệu (Mappings):</b> Ghép nối cột đích với tọa độ ô tương ứng của file con.</li>
+                </ul>
+            </li>
+            <li style='margin-bottom: 8px;'><b>📥 Tab Kiểm tra Chất lượng (QC):</b> Nơi làm việc hằng ngày. Kéo thả hàng chục file Excel vào đây. Phần mềm sẽ dựa vào Vân tay để nhận diện, tự quét lỗi tính toán, cảnh báo file hỏng.</li>
+            <li><b>🚀 Tab Tổng hợp Dữ liệu:</b> Chạy gộp. Phần mềm tự đối chiếu Số lô (Batch), nếu trùng sẽ ghi đè (cập nhật), nếu mới sẽ chèn thêm dòng vào cuối.</li>
         </ul>
         <hr>
         <h2 style='color: #2A82DA;'>2. BẢNG TRA CỨU CÔNG THỨC & TỌA ĐỘ</h2>

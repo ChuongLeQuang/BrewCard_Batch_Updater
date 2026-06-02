@@ -125,6 +125,19 @@ class TabConfigSystem(QWidget):
             )
             return
 
+        fallback_name = profile_data.get("fallback_profile")
+        if fallback_name and fallback_name != profile_data["profile_name"]:
+            fallback_config = AppConfig(fallback_name)
+            if not fallback_config.data.get("fingerprint", "").strip():
+                QMessageBox.warning(
+                    self,
+                    "Lỗi Form dự phòng",
+                    f"Hồ sơ dự phòng '{fallback_name}' hiện đang để trống Dấu vân tay!\n\n"
+                    "Để đảm bảo an toàn, Form dự phòng BẮT BUỘC phải có dấu vân tay. "
+                    f"Vui lòng chuyển sang Profile '{fallback_name}' và thiết lập vân tay cho nó trước.",
+                )
+                return
+
         self.config.profile_name = profile_data["profile_name"]
         self.config.data.update(profile_data)
         self.config.data["mappings"] = self.widget_mappings.get_mappings()

@@ -12,3 +12,10 @@ __pycache__/
 # Project specifics
 logs/
 output/
+
+# Build & Packaging
+dist/
+build/
+*.exe
+*.spec
+version_info.txt

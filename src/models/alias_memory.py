@@ -5,7 +5,10 @@ VI: Hệ thống bộ nhớ cho việc ghép nối tên cột, học hỏi từ 
 
 import json
 import os
+import logging
 from typing import Dict, Optional
+
+logger = logging.getLogger(__name__)
 
 
 class AliasMemory:
@@ -22,7 +25,14 @@ class AliasMemory:
             try:
                 with open(self.filepath, "r", encoding="utf-8") as f:
                     self.memory = json.load(f)
-            except (json.JSONDecodeError, FileNotFoundError):
+            except json.JSONDecodeError as e:
+                logger.warning(
+                    f"Alias memory file '{self.filepath}' is corrupted, "
+                    f"resetting to empty: {e}"
+                )
+                self.memory = {}
+            except (FileNotFoundError, OSError) as e:
+                logger.warning(f"Could not read alias memory: {e}")
                 self.memory = {}
 
     def save(self) -> None:

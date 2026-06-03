@@ -5,6 +5,7 @@ VI: Điểm bắt đầu (Entry point) của dự án BrewCard_Batch_Updater.
 
 import sys
 import os
+import logging
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QIcon
 from src.views.main_window import MainWindow
@@ -23,8 +24,8 @@ def main():
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
                 "brewcard.batch.updater.1.0"
             )
-        except Exception:
-            pass
+        except Exception as e:
+            logging.debug(f"Could not set AppUserModelID: {e}")
 
     app = QApplication(sys.argv)
 

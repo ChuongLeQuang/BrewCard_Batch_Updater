@@ -9,6 +9,8 @@ import glob
 import logging
 from typing import Dict, Any, List
 
+logger = logging.getLogger(__name__)
+
 
 class AppConfig:
     """
@@ -45,7 +47,7 @@ class AppConfig:
                 with open(self.settings_path, "w", encoding="utf-8") as f:
                     json.dump({"last_profile": "BrewCard"}, f)
             except Exception as e:
-                logging.error(f"Migration error: {e}")
+                logger.error(f"Migration error: {e}")
 
     def _get_default_data(self) -> Dict[str, Any]:
         return {
@@ -63,8 +65,8 @@ class AppConfig:
             try:
                 with open(self.settings_path, "r", encoding="utf-8") as f:
                     return json.load(f).get("last_profile")
-            except (FileNotFoundError, json.JSONDecodeError, KeyError):
-                pass
+            except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
+                logger.warning(f"Could not read last profile from settings: {e}")
         return "BrewCard"
 
     def _save_last_profile(self) -> None:
@@ -79,8 +81,12 @@ class AppConfig:
             try:
                 with open(self.config_path, "r", encoding="utf-8") as f:
                     self.data.update(json.load(f))
-            except (FileNotFoundError, json.JSONDecodeError) as e:
-                logging.error(f"Failed to load config: {e}")
+            except json.JSONDecodeError as e:
+                logger.error(
+                    f"Config file '{self.config_path}' is corrupted (invalid JSON): {e}"
+                )
+            except (FileNotFoundError, OSError) as e:
+                logger.error(f"Failed to load config '{self.config_path}': {e}")
 
     def save(self) -> None:
         """EN: Save data to JSON. VI: Lưu dữ liệu xuống tệp JSON."""
@@ -96,8 +102,12 @@ class AppConfig:
             try:
                 os.remove(self.config_path)
                 return True
-            except (FileNotFoundError, PermissionError):
-                pass
+            except PermissionError:
+                logger.error(
+                    f"Cannot delete profile '{self.config_path}': file is locked"
+                )
+            except OSError as e:
+                logger.error(f"Failed to delete profile '{self.config_path}': {e}")
         return False
 
     @staticmethod

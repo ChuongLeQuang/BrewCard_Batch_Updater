@@ -4,12 +4,15 @@ VI: Dịch vụ đồng bộ Excel để cập nhật file Tổng.
 """
 
 import os
+import logging
 import openpyxl
 from openpyxl.utils import column_index_from_string
 from typing import List, Dict, Any
 from src.models.config_model import AppConfig
 from src.models.excel_data_model import BrewRecord
 from src.config.constants import FORMAT_OPTIONS
+
+logger = logging.getLogger(__name__)
 
 
 class BrewSyncEngine:
@@ -123,5 +126,8 @@ class BrewSyncEngine:
             wb.close()
             return True
 
-        except Exception:
-            return False
+        except PermissionError:
+            raise
+        except Exception as e:
+            logger.error(f"Sync failed: {e}", exc_info=True)
+            raise

@@ -317,12 +317,19 @@ class TabQCCheck(QWidget):
             )
             return
 
-        log_path = log_qc_errors(self.error_map)
-        QMessageBox.information(
-            self,
-            "Xuất Log thành công",
-            f"Đã lưu báo cáo lỗi tại:\n{os.path.abspath(log_path)}",
-        )
+        try:
+            log_path = log_qc_errors(self.error_map)
+            QMessageBox.information(
+                self,
+                "Xuất Log thành công",
+                f"Đã lưu báo cáo lỗi tại:\n{os.path.abspath(log_path)}",
+            )
+        except (OSError, PermissionError) as e:
+            QMessageBox.critical(
+                self,
+                "Lỗi Xuất Log",
+                f"Không thể ghi file log: {e}",
+            )
 
     # --- Helper Methods ---
 

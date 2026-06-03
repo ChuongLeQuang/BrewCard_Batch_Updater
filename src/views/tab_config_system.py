@@ -99,7 +99,14 @@ class TabConfigSystem(QWidget):
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
         )
         if reply == QMessageBox.StandardButton.Yes:
-            self.config.delete_profile()
+            if not self.config.delete_profile():
+                QMessageBox.critical(
+                    self,
+                    "Lỗi xóa cấu hình",
+                    f"Không thể xóa cấu hình '{profile_name}'. "
+                    "Tệp có thể đang bị khóa hoặc không có quyền truy cập.",
+                )
+                return
             self.config = AppConfig("BrewCard")
             self._load_data_to_ui()
 

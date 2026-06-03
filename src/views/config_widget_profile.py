@@ -5,6 +5,7 @@ VI: Widget quản lý cấu hình Profile và File Đích.
 
 import os
 import re
+import logging
 import tempfile
 import shutil
 import openpyxl
@@ -24,6 +25,8 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, pyqtSignal
 from src.views.widget_noscroll_combobox import NoScrollComboBox
 from src.utils.core_utils import retry_io
+
+logger = logging.getLogger(__name__)
 
 
 class ConfigWidgetProfile(QWidget):
@@ -280,8 +283,12 @@ class ConfigWidgetProfile(QWidget):
                         self.available_headers[full_name] = col_letter
                         self.letter_to_name[col_letter] = full_name
                 wb.close()
-            except Exception:
-                pass
+            except PermissionError:
+                logger.warning(
+                    f"Target file is locked, cannot read headers: {target_path}"
+                )
+            except Exception as e:
+                logger.error(f"Failed to read headers from '{target_path}': {e}")
             finally:
                 try:
                     os.remove(tmp_path)

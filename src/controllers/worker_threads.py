@@ -3,6 +3,8 @@ EN: Worker threads for background processing.
 VI: Các luồng chạy ngầm để xử lý tác vụ nền.
 """
 
+import logging
+
 from PyQt6.QtCore import QThread, pyqtSignal
 from typing import List, Dict, Any
 
@@ -24,6 +26,8 @@ class QCWorker(QThread):
     )  # file_path, is_valid, errors, data_list
     finished = pyqtSignal()
 
+    _logger = logging.getLogger(__name__)
+
     def __init__(
         self, file_sheets_map: Dict[str, List[str]], config: AppConfig, parent=None
     ):
@@ -38,10 +42,18 @@ class QCWorker(QThread):
             percentage = int(((i + 1) / total_files) * 100)
             self.progress_update.emit(percentage, file_path)
 
-            is_valid, errors, data_list = scan_file_qc(
-                file_path, self.config, target_sheets
-            )
-            self.file_processed.emit(file_path, is_valid, errors, data_list)
+            try:
+                is_valid, errors, data_list = scan_file_qc(
+                    file_path, self.config, target_sheets
+                )
+                self.file_processed.emit(file_path, is_valid, errors, data_list)
+            except Exception as e:
+                self._logger.error(
+                    f"Unexpected error scanning '{file_path}': {e}", exc_info=True
+                )
+                self.file_processed.emit(
+                    file_path, False, [f"Lỗi không mong đợi: {e}"], []
+                )
 
         self.finished.emit()
 

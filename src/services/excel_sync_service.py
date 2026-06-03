@@ -10,6 +10,7 @@ from typing import List, Dict, Any
 from src.models.config_model import AppConfig
 from src.models.excel_data_model import BrewRecord
 from src.config.constants import FORMAT_OPTIONS
+from src.utils.file_utils import find_batch_column
 
 
 class BrewSyncEngine:
@@ -20,14 +21,7 @@ class BrewSyncEngine:
         self.target_path = self.config.data["target_file"]["path"]
         self.sheet_name = self.config.data["target_file"]["sheet_name"]
         self.mappings = self.config.data["mappings"]
-        self.batch_col_letter = self._find_batch_column()
-
-    def _find_batch_column(self) -> str:
-        """EN: Find the column letter for the batch number. VI: Tìm chữ cái của cột Số lô."""
-        for m in self.mappings:
-            if "batch" in m.get("target_col", "").lower():
-                return m.get("target_col_letter")
-        return self.mappings[0].get("target_col_letter", "A") if self.mappings else "A"
+        self.batch_col_letter = find_batch_column(self.mappings)
 
     def sync_records(self, records: List[BrewRecord]) -> bool:
         """

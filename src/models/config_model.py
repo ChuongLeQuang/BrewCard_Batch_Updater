@@ -8,6 +8,7 @@ import os
 import glob
 import logging
 from typing import Dict, Any, List
+from src.utils.json_io import load_json, save_json
 
 
 class AppConfig:
@@ -59,35 +60,23 @@ class AppConfig:
         }
 
     def _get_last_profile(self) -> str:
-        if os.path.exists(self.settings_path):
-            try:
-                with open(self.settings_path, "r", encoding="utf-8") as f:
-                    return json.load(f).get("last_profile")
-            except (FileNotFoundError, json.JSONDecodeError, KeyError):
-                pass
-        return "BrewCard"
+        data = load_json(self.settings_path, default={})
+        return data.get("last_profile", "BrewCard") if data else "BrewCard"
 
     def _save_last_profile(self) -> None:
-        os.makedirs(os.path.dirname(self.settings_path), exist_ok=True)
-        with open(self.settings_path, "w", encoding="utf-8") as f:
-            json.dump({"last_profile": self.profile_name}, f)
+        save_json(self.settings_path, {"last_profile": self.profile_name})
 
     def load(self) -> None:
         """EN: Load JSON from file. VI: Tải dữ liệu từ tệp JSON."""
         self.data = self._get_default_data()
-        if os.path.exists(self.config_path):
-            try:
-                with open(self.config_path, "r", encoding="utf-8") as f:
-                    self.data.update(json.load(f))
-            except (FileNotFoundError, json.JSONDecodeError) as e:
-                logging.error(f"Failed to load config: {e}")
+        loaded = load_json(self.config_path)
+        if loaded:
+            self.data.update(loaded)
 
     def save(self) -> None:
         """EN: Save data to JSON. VI: Lưu dữ liệu xuống tệp JSON."""
-        os.makedirs(self.config_dir, exist_ok=True)
         self.config_path = os.path.join(self.config_dir, f"{self.profile_name}.json")
-        with open(self.config_path, "w", encoding="utf-8") as f:
-            json.dump(self.data, f, indent=4, ensure_ascii=False)
+        save_json(self.config_path, self.data)
         self._save_last_profile()
 
     def delete_profile(self) -> bool:

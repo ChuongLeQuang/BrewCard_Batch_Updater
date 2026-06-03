@@ -16,6 +16,7 @@ from src.models.config_model import AppConfig
 from src.views.dialog_guide import GuideDialog
 from src.views.config_widget_profile import ConfigWidgetProfile
 from src.views.config_widget_mappings import ConfigWidgetMappings
+from src.utils.validation_utils import validate_fallback_fingerprint
 
 
 class TabConfigSystem(QWidget):
@@ -125,18 +126,18 @@ class TabConfigSystem(QWidget):
             )
             return
 
-        fallback_name = profile_data.get("fallback_profile")
-        if fallback_name and fallback_name != profile_data["profile_name"]:
-            fallback_config = AppConfig(fallback_name)
-            if not fallback_config.data.get("fingerprint", "").strip():
-                QMessageBox.warning(
-                    self,
-                    "Lỗi Form dự phòng",
-                    f"Hồ sơ dự phòng '{fallback_name}' hiện đang để trống Dấu vân tay!\n\n"
-                    "Để đảm bảo an toàn, Form dự phòng BẮT BUỘC phải có dấu vân tay. "
-                    f"Vui lòng chuyển sang Profile '{fallback_name}' và thiết lập vân tay cho nó trước.",
-                )
-                return
+        temp_config = AppConfig(profile_data["profile_name"])
+        temp_config.data.update(profile_data)
+        fp_valid, fallback_name = validate_fallback_fingerprint(temp_config)
+        if not fp_valid:
+            QMessageBox.warning(
+                self,
+                "Lỗi Form dự phòng",
+                f"Hồ sơ dự phòng '{fallback_name}' hiện đang để trống Dấu vân tay!\n\n"
+                "Để đảm bảo an toàn, Form dự phòng BẮT BUỘC phải có dấu vân tay. "
+                f"Vui lòng chuyển sang Profile '{fallback_name}' và thiết lập vân tay cho nó trước.",
+            )
+            return
 
         self.config.profile_name = profile_data["profile_name"]
         self.config.data.update(profile_data)

@@ -5,9 +5,6 @@ VI: Widget quản lý cấu hình Profile và File Đích.
 
 import os
 import re
-import tempfile
-import shutil
-import openpyxl
 from openpyxl.utils import get_column_letter
 from PyQt6.QtWidgets import (
     QWidget,
@@ -23,7 +20,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, pyqtSignal
 from src.views.widget_noscroll_combobox import NoScrollComboBox
-from src.utils.core_utils import retry_io
+from src.utils.file_utils import temp_workbook
 
 
 class ConfigWidgetProfile(QWidget):
@@ -164,14 +161,6 @@ class ConfigWidgetProfile(QWidget):
                 f"👉 Luồng: Khớp vân tay [{current_prof}] ➡️ (Nếu sai) ➡️ ❌ Bỏ qua (Sheet rác)"
             )
 
-    @retry_io(retries=3, delay=1.0)
-    def _safe_load_workbook(
-        self, file_path: str, read_only: bool = True, data_only: bool = False
-    ):
-        return openpyxl.load_workbook(
-            file_path, read_only=read_only, data_only=data_only
-        )
-
     def _browse_target_file(self):
         file_path, _ = QFileDialog.getOpenFileName(
             self,
@@ -190,24 +179,15 @@ class ConfigWidgetProfile(QWidget):
         sheets = []
         if os.path.exists(file_path):
             if file_path.lower().endswith((".xlsx", ".xlsm")):
-                fd, tmp_path = tempfile.mkstemp(suffix=".xlsx")
-                os.close(fd)
                 try:
-                    shutil.copy2(file_path, tmp_path)
-                    wb = self._safe_load_workbook(tmp_path, read_only=True)
-                    sheets = wb.sheetnames
-                    wb.close()
+                    with temp_workbook(file_path, read_only=True) as wb:
+                        sheets = wb.sheetnames
                 except Exception as e:
                     QMessageBox.warning(
                         self,
                         "Lỗi đọc file",
                         f"Không thể đọc danh sách sheet.\nChi tiết lỗi: {str(e)}",
                     )
-                finally:
-                    try:
-                        os.remove(tmp_path)
-                    except OSError:
-                        pass
             elif file_path.lower().endswith((".xlsb", ".xls")):
                 QMessageBox.warning(
                     self,
@@ -245,48 +225,38 @@ class ConfigWidgetProfile(QWidget):
         if os.path.exists(target_path) and target_path.lower().endswith(
             (".xlsx", ".xlsm")
         ):
-            fd, tmp_path = tempfile.mkstemp(suffix=".xlsx")
-            os.close(fd)
             try:
-                shutil.copy2(target_path, tmp_path)
-                wb = self._safe_load_workbook(tmp_path, read_only=True, data_only=True)
+                with temp_workbook(target_path, read_only=True, data_only=True) as wb:
+                    sheet = None
+                    if sheet_name in wb.sheetnames:
+                        sheet = wb[sheet_name]
+                    elif wb.sheetnames:
+                        sheet = wb.active
 
-                sheet = None
-                if sheet_name in wb.sheetnames:
-                    sheet = wb[sheet_name]
-                elif wb.sheetnames:
-                    sheet = wb.active
+                    if sheet:
+                        header_dict = {}
+                        for row in sheet.iter_rows(min_row=start_r, max_row=end_r):
+                            for col_idx, cell in enumerate(row, start=1):
+                                val = (
+                                    str(cell.value).strip()
+                                    if cell.value is not None
+                                    else ""
+                                )
+                                if val:
+                                    header_dict.setdefault(col_idx, []).append(val)
 
-                if sheet:
-                    header_dict = {}
-                    for row in sheet.iter_rows(min_row=start_r, max_row=end_r):
-                        for col_idx, cell in enumerate(row, start=1):
-                            val = (
-                                str(cell.value).strip()
-                                if cell.value is not None
-                                else ""
-                            )
-                            if val:
-                                header_dict.setdefault(col_idx, []).append(val)
-
-                    for col_idx, parts in header_dict.items():
-                        full_name = " - ".join(parts)
-                        col_letter = get_column_letter(col_idx)
-                        original_name = full_name
-                        counter = 1
-                        while full_name in self.available_headers:
-                            full_name = f"{original_name} ({counter})"
-                            counter += 1
-                        self.available_headers[full_name] = col_letter
-                        self.letter_to_name[col_letter] = full_name
-                wb.close()
+                        for col_idx, parts in header_dict.items():
+                            full_name = " - ".join(parts)
+                            col_letter = get_column_letter(col_idx)
+                            original_name = full_name
+                            counter = 1
+                            while full_name in self.available_headers:
+                                full_name = f"{original_name} ({counter})"
+                                counter += 1
+                            self.available_headers[full_name] = col_letter
+                            self.letter_to_name[col_letter] = full_name
             except Exception:
                 pass
-            finally:
-                try:
-                    os.remove(tmp_path)
-                except OSError:
-                    pass
 
         self.headers_refreshed.emit(self.letter_to_name)
 

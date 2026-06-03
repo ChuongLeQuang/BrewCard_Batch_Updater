@@ -32,6 +32,8 @@ from src.models.config_model import AppConfig
 from src.models.excel_data_model import BrewRecord
 from src.controllers.worker_threads import QCWorker
 from src.utils.qc_logger import log_qc_errors
+from src.utils.file_utils import find_batch_column
+from src.utils.validation_utils import validate_fallback_fingerprint
 from src.config.constants import COLOR_ERROR_TEXT, COLOR_SUCCESS_TEXT
 
 
@@ -213,11 +215,7 @@ class TabQCCheck(QWidget):
         # 1. Trích xuất và lưu dữ liệu hợp lệ (nếu có)
         if data_list:
             config = AppConfig()
-            batch_col_letter = "A"
-            for m in config.data.get("mappings", []):
-                if "batch" in m.get("target_col", "").lower():
-                    batch_col_letter = m.get("target_col_letter")
-                    break
+            batch_col_letter = find_batch_column(config.data.get("mappings", []))
 
             for data in data_list:
                 batch_number = str(data.get(batch_col_letter, "N/A"))
@@ -270,18 +268,16 @@ class TabQCCheck(QWidget):
             return
 
         config = AppConfig()
-        fallback_name = config.data.get("fallback_profile")
-        if fallback_name:
-            fallback_config = AppConfig(fallback_name)
-            if not fallback_config.data.get("fingerprint", "").strip():
-                QMessageBox.critical(
-                    self,
-                    "Lỗi Bảo mật Dữ liệu",
-                    f"Hồ sơ dự phòng '{fallback_name}' đang KHÔNG CÓ Dấu vân tay!\n\n"
-                    f"Nếu bỏ qua, mọi file rác sẽ chui lọt vào hệ thống thông qua lỗ hổng này.\n"
-                    f"Vui lòng quay lại Tab Cấu hình, mở Profile '{fallback_name}' lên và cài đặt Dấu hiệu nhận diện cho nó trước.",
-                )
-                return
+        fp_valid, fallback_name = validate_fallback_fingerprint(config)
+        if not fp_valid:
+            QMessageBox.critical(
+                self,
+                "Lỗi Bảo mật Dữ liệu",
+                f"Hồ sơ dự phòng '{fallback_name}' đang KHÔNG CÓ Dấu vân tay!\n\n"
+                f"Nếu bỏ qua, mọi file rác sẽ chui lọt vào hệ thống thông qua lỗ hổng này.\n"
+                f"Vui lòng quay lại Tab Cấu hình, mở Profile '{fallback_name}' lên và cài đặt Dấu hiệu nhận diện cho nó trước.",
+            )
+            return
 
         self.btn_start_scan.setEnabled(False)
         self.btn_clear_list.setEnabled(False)

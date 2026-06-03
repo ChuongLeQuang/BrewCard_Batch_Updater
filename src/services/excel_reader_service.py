@@ -6,24 +6,15 @@ VI: Dịch vụ đọc file Excel phục vụ kiểm tra chất lượng (QC).
 import os
 import time
 import logging
-import openpyxl
-import tempfile
-import shutil
 import re
 from openpyxl.utils.exceptions import InvalidFileException
 from typing import Dict, Any, Tuple, List
 from src.models.config_model import AppConfig
 from src.utils.formula_parser import ExcelFormulaEvaluator
-from src.utils.core_utils import retry_io
+from src.utils.file_utils import safe_load_workbook, temp_workbook
 from src.config.constants import IMPORT_NAME_KEYWORDS, IMPORT_FORMULA_KEYWORDS
 
 logger = logging.getLogger(__name__)
-
-
-@retry_io(retries=3, delay=1.0)
-def _safe_load_workbook(file_path: str, data_only: bool = True):
-    """EN: Load workbook with retry mechanism. VI: Mở tệp Excel kèm cơ chế thử lại."""
-    return openpyxl.load_workbook(file_path, data_only=data_only)
 
 
 def _check_fingerprint(ws, rule_str: str) -> bool:
@@ -57,44 +48,23 @@ def _check_fingerprint(ws, rule_str: str) -> bool:
 
 def get_sheet_names(file_path: str) -> List[str]:
     """EN: Get all sheet names from an Excel file safely. VI: Lấy danh sách tên sheet."""
-    fd, tmp_path = tempfile.mkstemp(suffix=".xlsx")
-    os.close(fd)
-    try:
-        shutil.copy2(file_path, tmp_path)
-        wb = _safe_load_workbook(tmp_path, data_only=True)
-        names = wb.sheetnames
-        wb.close()
-        return names
-    finally:
-        try:
-            os.remove(tmp_path)
-        except OSError:
-            pass
+    with temp_workbook(file_path, data_only=True) as wb:
+        return wb.sheetnames
 
 
 def get_sheet_preview(
     file_path: str, sheet_name: str, max_rows: int = 20
 ) -> List[List[Any]]:
     """EN: Get preview data from sheet. VI: Lấy tối đa 20 dòng để xem trước."""
-    fd, tmp_path = tempfile.mkstemp(suffix=".xlsx")
-    os.close(fd)
     preview = []
-    try:
-        shutil.copy2(file_path, tmp_path)
-        wb = _safe_load_workbook(tmp_path, data_only=True)
+    with temp_workbook(file_path, data_only=True) as wb:
         if sheet_name in wb.sheetnames:
             sheet = wb[sheet_name]
             for r_idx, row in enumerate(sheet.iter_rows(values_only=True)):
                 if r_idx >= max_rows:
                     break
                 preview.append([str(c) if c is not None else "" for c in row])
-        wb.close()
-        return preview
-    finally:
-        try:
-            os.remove(tmp_path)
-        except OSError:
-            pass
+    return preview
 
 
 def extract_formulas_from_sheet(
@@ -105,14 +75,9 @@ def extract_formulas_from_sheet(
     manual_start_row: int = -1,
 ) -> List[Tuple[str, str]]:
     """EN: Extract raw (name, formula) pairs from a specific sheet. VI: Trích xuất tên và công thức."""
-    fd, tmp_path = tempfile.mkstemp(suffix=".xlsx")
-    os.close(fd)
     results = []
-    try:
-        shutil.copy2(file_path, tmp_path)
-        wb = _safe_load_workbook(tmp_path, data_only=False)
+    with temp_workbook(file_path, data_only=False) as wb:
         if sheet_name not in wb.sheetnames:
-            wb.close()
             raise ValueError(f"Sheet '{sheet_name}' không tồn tại.")
 
         sheet = wb[sheet_name]
@@ -148,7 +113,6 @@ def extract_formulas_from_sheet(
                     break
 
         if name_col_idx == -1 or form_col_idx == -1:
-            wb.close()
             raise ValueError(
                 "Không thể tự động nhận diện cột 'Tên' và 'Công thức' trong sheet này.\nVui lòng đảm bảo file có dòng tiêu đề chứa các từ khóa phù hợp."
             )
@@ -168,7 +132,6 @@ def extract_formulas_from_sheet(
             norm_name = normalize_name(clean_name)
 
             if norm_name in seen_names:
-                wb.close()
                 raise ValueError(
                     f"Lỗi: File của khách hàng chứa các cột có tên trùng lặp ('{clean_name}'). Vui lòng yêu cầu khách hàng sửa lại file trước khi nạp."
                 )
@@ -177,13 +140,7 @@ def extract_formulas_from_sheet(
             clean_form = sanitize_formula(raw_form)
             results.append((clean_name, clean_form))
 
-        wb.close()
-        return results
-    finally:
-        try:
-            os.remove(tmp_path)
-        except OSError:
-            pass
+    return results
 
 
 def normalize_name(text: str) -> str:
@@ -249,7 +206,7 @@ def scan_file_qc(
         start_time = time.time()
         logger.info(f"[Milestone] Bắt đầu quét file: {file_path}")
 
-        wb = _safe_load_workbook(file_path, data_only=True)
+        wb = safe_load_workbook(file_path, data_only=True)
 
         input_sheet_name = config.data.get("input_file", {}).get("sheet_name")
         sheets_to_scan = []

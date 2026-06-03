@@ -5,6 +5,7 @@ VI: Mô hình dữ liệu cấu hình ứng dụng.
 
 import json
 import os
+import re
 import glob
 import logging
 from typing import Dict, Any, List
@@ -16,6 +17,14 @@ class AppConfig:
     VI: Quản lý tải và lưu cấu hình vào tệp JSON.
     """
 
+    @staticmethod
+    def _sanitize_profile_name(name: str) -> str:
+        """EN: Sanitize profile name to prevent path traversal. VI: Loại bỏ ký tự nguy hiểm khỏi tên profile."""
+        sanitized = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "_", name.strip())
+        sanitized = sanitized.replace("..", "_")
+        sanitized = sanitized.strip(". ")
+        return sanitized if sanitized else "BrewCard"
+
     def __init__(self, profile_name: str = ""):
         self.config_dir = "data/profiles"
         self.settings_path = "data/app_settings.json"
@@ -25,7 +34,9 @@ class AppConfig:
         if not profile_name:
             profile_name = self._get_last_profile()
 
-        self.profile_name = profile_name if profile_name else "BrewCard"
+        self.profile_name = (
+            self._sanitize_profile_name(profile_name) if profile_name else "BrewCard"
+        )
         self.config_path = os.path.join(self.config_dir, f"{self.profile_name}.json")
 
         self.data: Dict[str, Any] = self._get_default_data()
@@ -85,6 +96,7 @@ class AppConfig:
     def save(self) -> None:
         """EN: Save data to JSON. VI: Lưu dữ liệu xuống tệp JSON."""
         os.makedirs(self.config_dir, exist_ok=True)
+        self.profile_name = self._sanitize_profile_name(self.profile_name)
         self.config_path = os.path.join(self.config_dir, f"{self.profile_name}.json")
         with open(self.config_path, "w", encoding="utf-8") as f:
             json.dump(self.data, f, indent=4, ensure_ascii=False)

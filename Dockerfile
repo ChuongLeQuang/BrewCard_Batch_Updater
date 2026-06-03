@@ -11,5 +11,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy mã nguồn vào container
 COPY . .
 
+# Chạy ứng dụng dưới người dùng không có quyền root
+RUN adduser --disabled-password --gecos "" appuser && chown -R appuser:appuser /app
+USER appuser
+
 # Chạy ứng dụng
 CMD ["python", "main.py"]

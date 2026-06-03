@@ -11,17 +11,17 @@ import logging
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
-def run_cmd(cmd: str, desc: str) -> None:
+def run_cmd(cmd: list, desc: str) -> None:
     """
     Thực thi một lệnh shell hệ thống và kiểm tra lỗi.
     - Inputs:
-      + cmd (str): Lệnh shell cần thực thi.
+      + cmd (list): Danh sách đối số lệnh cần thực thi (không dùng shell=True).
       + desc (str): Mô tả hiển thị trên màn hình.
     - Outputs: Không trả về giá trị (None). Sẽ dừng chương trình bằng sys.exit(1) nếu lệnh thất bại.
     """
     logging.info(f"\n🔄 {desc}...")
     try:
-        subprocess.run(cmd, check=True, shell=True)
+        subprocess.run(cmd, check=True)
         logging.info(f"✅ Xong: {desc}")
     except subprocess.CalledProcessError:
         logging.error(f"\n❌ LỖI NGHIÊM TRỌNG: {desc} thất bại!")
@@ -41,7 +41,7 @@ def main() -> None:
     try:
         import black
 
-        run_cmd(f'"{sys.executable}" -m black .', "Định dạng mã nguồn bằng Black")
+        run_cmd([sys.executable, "-m", "black", "."], "Định dạng mã nguồn bằng Black")
     except ImportError:
         logging.warning(
             "\n⚠️ Cảnh báo: Thư viện 'black' chưa được cài đặt, bỏ qua định dạng."
@@ -50,7 +50,7 @@ def main() -> None:
     # 2. Vẽ lại sơ đồ Kiến trúc (Cập nhật README)
     if os.path.exists("scan_architecture.py"):
         run_cmd(
-            f'"{sys.executable}" scan_architecture.py',
+            [sys.executable, "scan_architecture.py"],
             "Cập nhật tài liệu Architecture (README.md)",
         )
 
@@ -58,7 +58,7 @@ def main() -> None:
     try:
         import pytest
 
-        run_cmd(f'"{sys.executable}" -m pytest', "Chạy Unit Tests (Pytest)")
+        run_cmd([sys.executable, "-m", "pytest"], "Chạy Unit Tests (Pytest)")
     except ImportError:
         logging.warning(
             "\n⚠️ Cảnh báo: Thư viện 'pytest' chưa được cài đặt, bỏ qua kiểm thử."

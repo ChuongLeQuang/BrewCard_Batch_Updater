@@ -46,6 +46,7 @@ Nếu bạn đã khởi tạo kèm `.venv`, hãy kích hoạt nó bằng lệnh 
     ┣ 📜 .gitignore
     ┣ 📜 AI_RULES.md
     ┣ 📜 PLAN.md
+    ┣ 📜 README.md
     ┣ 📜 build.py
     ┣ 📜 generate_mocks.py
     ┣ 📜 main.py
@@ -53,7 +54,6 @@ Nếu bạn đã khởi tạo kèm `.venv`, hãy kích hoạt nó bằng lệnh 
     ┣ 📜 relink_github.bat
     ┣ 📜 requirements.txt
     ┣ 📜 version.txt
-    ┣ 📜 README.md
     ┣ 📂 src
         ┣ 📜 __init__.py
         ┣ 📂 models
@@ -86,13 +86,13 @@ Nếu bạn đã khởi tạo kèm `.venv`, hãy kích hoạt nó bằng lệnh 
             ┣ 📜 main_window.py
             ┣ 📜 widget_excel_mockup.py
             ┣ 📜 widget_noscroll_combobox.py
+            ┣ 📜 config_widget_profile.py
             ┣ 📜 __init__.py
             ┣ 📜 config_dialog_alias.py
+            ┣ 📜 config_widget_mappings.py
             ┣ 📜 dialog_column_selector.py
             ┣ 📜 dialog_guide.py
             ┣ 📜 tab_config_system.py
-            ┣ 📜 config_widget_mappings.py
-            ┣ 📜 config_widget_profile.py
             ┣ 📜 tab_qc_check.py
     ┣ 📂 tests
         ┣ 📜 test_BrewCard_Batch_Updater.py
@@ -118,15 +118,15 @@ Nếu bạn đã khởi tạo kèm `.venv`, hãy kích hoạt nó bằng lệnh 
         ┣ 📜 E2E_Happy_Path_Result.xlsx
     ┣ 📂 data
         ┣ 📜 Dot Graph Syn from BrewCard 2026.xlsx
-        ┣ 📜 BUD Brewcard sync.xlsx
-        ┣ 📜 Test.xlsx
         ┣ 📜 BUD18P-027-029-W04-CCT14.xlsm
-        ┣ 📜 Copy of Point map import template_1781070615921.xlsx
         ┣ 📜 app_settings.json
+        ┣ 📜 BUD Brewcard sync.xlsx
+        ┣ 📜 Copy of Point map import template_1781070615921.xlsx
+        ┣ 📜 Test.xlsx
         ┣ 📂 profiles
             ┣ 📜 BrewCard_FormOld.json
-            ┣ 📜 BrewCard_FormNew.json
             ┣ 📜 BrewCard_BUD&BUDTW 1.json
+            ┣ 📜 BrewCard_FormNew.json
     ┣ 📂 .github
         ┣ 📂 workflows
             ┣ 📜 build.yml

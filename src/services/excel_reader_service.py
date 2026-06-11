@@ -245,6 +245,7 @@ def scan_file_qc(
         errors.append(f"File không tồn tại: {file_path}")
         return False, errors, []
 
+    wb = None
     try:
         start_time = time.time()
         logger.info(f"[Milestone] Bắt đầu quét file: {file_path}")
@@ -338,8 +339,6 @@ def scan_file_qc(
             else:
                 extracted_data_list.append(extracted_data)
 
-        wb.close()
-
         end_time = time.time()
         logger.info(
             f"[Milestone] Hoàn tất trích xuất '{file_path}' trong {end_time - start_time:.2f} giây."
@@ -353,6 +352,9 @@ def scan_file_qc(
         errors.append(f"Định dạng tệp không hợp lệ: {e}")
     except (OSError, FileNotFoundError) as e:
         errors.append(f"Không thể đọc file Excel '{os.path.basename(file_path)}': {e}")
+    finally:
+        if wb is not None:
+            wb.close()
 
     # Chỉ trả về False nếu không có mẻ nào được trích xuất thành công
     if not extracted_data_list:

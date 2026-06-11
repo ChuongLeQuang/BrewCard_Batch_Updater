@@ -30,58 +30,32 @@ Nếu bạn đã khởi tạo kèm `.venv`, hãy kích hoạt nó bằng lệnh 
 ### 🌳 Cây Thư Mục
 ```text
 📦 BrewCard_Batch_Updater
-    ┣ 📜 .dockerignore
     ┣ 📜 .env.example
+    ┣ 📜 .env
+    ┣ 📜 scan_architecture.py
+    ┣ 📜 auto_checks.py
+    ┣ 📜 .dockerignore
+    ┣ 📜 Dockerfile
+    ┣ 📜 docker-compose.yml
+    ┣ 📜 LICENSE
+    ┣ 📜 sync.bat
+    ┣ 📜 check.bat
+    ┣ 📜 build.bat
+    ┣ 📜 init_github.bat
+    ┣ 📜 pytest.ini
     ┣ 📜 .gitignore
     ┣ 📜 AI_RULES.md
-    ┣ 📜 auto_checks.py
-    ┣ 📜 build.bat
-    ┣ 📜 build.py
-    ┣ 📜 check.bat
-    ┣ 📜 docker-compose.yml
-    ┣ 📜 Dockerfile
-    ┣ 📜 init_github.bat
-    ┣ 📜 LICENSE
-    ┣ 📜 main.py
     ┣ 📜 PLAN.md
-    ┣ 📜 pytest.ini
-    ┣ 📜 README.md
-    ┣ 📜 requirements.txt
-    ┣ 📜 scan_architecture.py
-    ┣ 📜 sync.bat
-    ┣ 📜 version.txt
-    ┣ 📜 migrate_json.py
+    ┣ 📜 build.py
     ┣ 📜 generate_mocks.py
+    ┣ 📜 main.py
+    ┣ 📜 migrate_json.py
     ┣ 📜 relink_github.bat
-    ┣ 📂 .github
-        ┣ 📂 workflows
-            ┣ 📜 build.yml
-    ┣ 📂 assets
-        ┣ 📜 icon0.png
-        ┣ 📜 icon1.png
-        ┣ 📜 icon3.png
-        ┣ 📜 icon4.png
-        ┣ 📜 icon.ico
-        ┣ 📜 icon.png
-    ┣ 📂 data
-        ┣ 📜 Dot Graph Syn from BrewCard 2026.xlsx
-        ┣ 📜 app_settings.json
-        ┣ 📜 BUD Brewcard sync.xlsx
-        ┣ 📜 Test.xlsx
-        ┣ 📂 profiles
-            ┣ 📜 BrewCard_FormNew.json
-            ┣ 📜 BrewCard_FormOld.json
+    ┣ 📜 requirements.txt
+    ┣ 📜 version.txt
+    ┣ 📜 README.md
     ┣ 📂 src
         ┣ 📜 __init__.py
-        ┣ 📂 config
-            ┣ 📜 __init__.py
-            ┣ 📜 constants.py
-        ┣ 📂 controllers
-            ┣ 📜 __init__.py
-            ┣ 📜 worker_threads.py
-        ┣ 📂 exceptions
-            ┣ 📜 __init__.py
-            ┣ 📜 custom_exceptions.py
         ┣ 📂 models
             ┣ 📜 __init__.py
             ┣ 📜 config_model.py
@@ -93,39 +67,69 @@ Nếu bạn đã khởi tạo kèm `.venv`, hãy kích hoạt nó bằng lệnh 
             ┣ 📜 excel_sync_service.py
         ┣ 📂 utils
             ┣ 📜 __init__.py
-            ┣ 📜 core_utils.py
-            ┣ 📜 formula_parser.py
-            ┣ 📜 qc_logger.py
             ┣ 📜 retry_example.py
             ┣ 📜 theme_manager.py
+            ┣ 📜 qc_logger.py
+            ┣ 📜 core_utils.py
+            ┣ 📜 formula_parser.py
+        ┣ 📂 controllers
+            ┣ 📜 __init__.py
+            ┣ 📜 worker_threads.py
+        ┣ 📂 config
+            ┣ 📜 __init__.py
+            ┣ 📜 constants.py
+        ┣ 📂 exceptions
+            ┣ 📜 __init__.py
+            ┣ 📜 custom_exceptions.py
         ┣ 📂 views
-            ┣ 📜 config_widget_mappings.py
-            ┣ 📜 config_widget_profile.py
-            ┣ 📜 dialog_guide.py
-            ┣ 📜 main_window.py
-            ┣ 📜 tab_config_system.py
-            ┣ 📜 tab_qc_check.py
             ┣ 📜 tab_sync_data.py
+            ┣ 📜 main_window.py
             ┣ 📜 widget_excel_mockup.py
             ┣ 📜 widget_noscroll_combobox.py
+            ┣ 📜 __init__.py
             ┣ 📜 config_dialog_alias.py
             ┣ 📜 dialog_column_selector.py
-            ┣ 📜 __init__.py
+            ┣ 📜 dialog_guide.py
+            ┣ 📜 tab_config_system.py
+            ┣ 📜 config_widget_mappings.py
+            ┣ 📜 config_widget_profile.py
+            ┣ 📜 tab_qc_check.py
     ┣ 📂 tests
         ┣ 📜 test_BrewCard_Batch_Updater.py
+        ┣ 📜 test_alias_memory.py
+        ┣ 📜 test_config_model.py
+        ┣ 📜 test_e2e_workflow.py
         ┣ 📜 test_excel_services.py
         ┣ 📜 test_formula_parser.py
-        ┣ 📜 test_config_model.py
-        ┣ 📜 test_alias_memory.py
-        ┣ 📜 test_e2e_workflow.py
         ┣ 📂 test_data
             ┣ 📜 mock_input_batch.xlsx
             ┣ 📜 mock_input_clean.xlsx
-            ┣ 📜 mock_input_dirty.xlsx
             ┣ 📜 mock_input_clean_update.xlsx
             ┣ 📜 mock_input_complex_formulas.xlsx
+            ┣ 📜 mock_input_dirty.xlsx
             ┣ 📜 mock_input_dirty_wrong_form.xlsx
             ┣ 📜 mock_master.xlsx
+    ┣ 📂 logs
+        ┣ 📜 qc_errors_20260518_183915.txt
+        ┣ 📜 qc_errors_20260518_184008.txt
+        ┣ 📜 qc_errors_20260518_185159.txt
+    ┣ 📂 output
+        ┣ 📜 E2E_Dirty_Path_Result.xlsx
+        ┣ 📜 E2E_Happy_Path_Result.xlsx
+    ┣ 📂 data
+        ┣ 📜 Dot Graph Syn from BrewCard 2026.xlsx
+        ┣ 📜 BUD Brewcard sync.xlsx
+        ┣ 📜 Test.xlsx
+        ┣ 📜 BUD18P-027-029-W04-CCT14.xlsm
+        ┣ 📜 Copy of Point map import template_1781070615921.xlsx
+        ┣ 📜 app_settings.json
+        ┣ 📂 profiles
+            ┣ 📜 BrewCard_FormOld.json
+            ┣ 📜 BrewCard_FormNew.json
+            ┣ 📜 BrewCard_BUD&BUDTW 1.json
+    ┣ 📂 .github
+        ┣ 📂 workflows
+            ┣ 📜 build.yml
     ┣ 📂 .pytest_cache
         ┣ 📜 README.md
         ┣ 📜 .gitignore
@@ -134,9 +138,13 @@ Nếu bạn đã khởi tạo kèm `.venv`, hãy kích hoạt nó bằng lệnh 
             ┣ 📂 cache
                 ┣ 📜 nodeids
                 ┣ 📜 lastfailed
-    ┣ 📂 output
-        ┣ 📜 E2E_Dirty_Path_Result.xlsx
-        ┣ 📜 E2E_Happy_Path_Result.xlsx
+    ┣ 📂 assets
+        ┣ 📜 icon3.png
+        ┣ 📜 icon4.png
+        ┣ 📜 icon1.png
+        ┣ 📜 icon.ico
+        ┣ 📜 icon.png
+        ┣ 📜 icon0.png
 ```
 ### 🧩 Chi Tiết Modules (Tổng quan)
 
@@ -380,7 +388,8 @@ Phần này trích xuất tự động thông tin về Đầu vào (Inputs) và 
   - **`def __init__(config: AppConfig) -> Any`**
     > Chưa có mô tả.
   - **`def _find_batch_column() -> str`**
-    > EN: Find the column letter for the batch number. VI: Tìm chữ cái của cột Số lô.
+    > EN: Find the primary key column (Explicitly marked by user).
+    > VI: Lấy chữ cái của cột Khóa chính (Được người dùng tích chọn).
   - **`def sync_records(records: List[BrewRecord]) -> bool`**
     > EN: Sync records into the target master file (Insert/Update/Sort).
     > VI: Đồng bộ danh sách dữ liệu vào file tổng (Thêm mới/Cập nhật/Sắp xếp).
@@ -496,7 +505,7 @@ Phần này trích xuất tự động thông tin về Đầu vào (Inputs) và 
     > Chưa có mô tả.
   - **`def _update_target_name_by_cmb(cmb: QComboBox, col_letter: str) -> Any`**
     > Chưa có mô tả.
-  - **`def _add_mapping_row(target_col: str, target_letter: str, source_mapping: str, format_type: str, scroll_to_bottom: bool) -> Any`**
+  - **`def _add_mapping_row(target_col: str, target_letter: str, source_mapping: str, is_key: bool, format_type: str, scroll_to_bottom: bool) -> Any`**
     > Chưa có mô tả.
   - **`def _delete_mapping_row(btn: QPushButton) -> Any`**
     > Chưa có mô tả.
@@ -520,8 +529,6 @@ Phần này trích xuất tự động thông tin về Đầu vào (Inputs) và 
   - **`def _setup_ui() -> Any`**
     > Chưa có mô tả.
   - **`def _setup_connections() -> Any`**
-    > Chưa có mô tả.
-  - **`def _on_target_path_edited() -> Any`**
     > Chưa có mô tả.
   - **`def _update_chain_preview() -> Any`**
     > Chưa có mô tả.
@@ -604,6 +611,13 @@ Phần này trích xuất tự động thông tin về Đầu vào (Inputs) và 
 #### 📄 `src/views/tab_qc_check.py`
 **Classes:**
 
+- **`class FileScannerWorker`**
+  > Luồng ngầm quét danh sách sheet để không làm treo UI.
+  - **`def __init__(file_paths: List[str], parent) -> Any`**
+    > Chưa có mô tả.
+  - **`def run() -> Any`**
+    > Chưa có mô tả.
+
 - **`class SheetSelectionDialog`**
   > Chưa có mô tả.
   - **`def __init__(file_name: str, all_sheets: List[str], selected_sheets: List[str], parent) -> Any`**
@@ -641,6 +655,10 @@ Phần này trích xuất tự động thông tin về Đầu vào (Inputs) và 
   - **`def _export_errors() -> None`**
     > Chưa có mô tả.
   - **`def _add_files_to_table(file_paths: List[str]) -> None`**
+    > Chưa có mô tả.
+  - **`def _on_file_scanned(path: str, all_sheets: List[str], file_error: str) -> None`**
+    > Chưa có mô tả.
+  - **`def _on_scan_finished() -> None`**
     > Chưa có mô tả.
   - **`def _open_sheet_selector(file_path: str, row: int) -> Any`**
     > Chưa có mô tả.

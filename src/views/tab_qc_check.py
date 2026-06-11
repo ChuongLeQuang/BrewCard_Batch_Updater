@@ -6,7 +6,7 @@ VI: Phân hệ Kiểm tra Chất lượng (QC).
 import os
 from typing import List, Dict, Any
 
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal, QThread
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import (
     QWidget,
@@ -33,6 +33,41 @@ from src.models.excel_data_model import BrewRecord
 from src.controllers.worker_threads import QCWorker
 from src.utils.qc_logger import log_qc_errors
 from src.config.constants import COLOR_ERROR_TEXT, COLOR_SUCCESS_TEXT
+
+
+class FileScannerWorker(QThread):
+    """Luồng ngầm quét danh sách sheet để không làm treo UI."""
+
+    file_scanned = pyqtSignal(str, list, str)
+    finished_scan = pyqtSignal()
+
+    def __init__(self, file_paths: List[str], parent=None):
+        super().__init__(parent)
+        self.file_paths = file_paths
+
+    def run(self):
+        for path in self.file_paths:
+            all_sheets = []
+            file_error = ""
+            wb = None
+            try:
+                wb = openpyxl.load_workbook(path, read_only=True)
+                all_sheets = [
+                    ws.title for ws in wb.worksheets if ws.sheet_state == "visible"
+                ]
+            except PermissionError:
+                file_error = "Tệp đang bị khóa (có thể đang mở trên Excel)."
+            except openpyxl.utils.exceptions.InvalidFileException:
+                file_error = "Định dạng tệp không hợp lệ."
+            except Exception as e:
+                file_error = f"Lỗi đọc tệp: {e}"
+            finally:
+                if wb is not None:
+                    wb.close()
+
+            self.file_scanned.emit(path, all_sheets, file_error)
+
+        self.finished_scan.emit()
 
 
 class SheetSelectionDialog(QDialog):
@@ -212,15 +247,27 @@ class TabQCCheck(QWidget):
 
         # 1. Trích xuất và lưu dữ liệu hợp lệ (nếu có)
         if data_list:
-            config = AppConfig()
-            batch_col_letter = "A"
-            for m in config.data.get("mappings", []):
-                if "batch" in m.get("target_col", "").lower():
+            config = self.qc_worker.config if self.qc_worker else AppConfig()
+            mappings = config.data.get("mappings", [])
+
+            # Lấy Khóa chính dựa trên cấu hình do người dùng tích chọn (is_key)
+            batch_col_letter = (
+                mappings[0].get("target_col_letter", "A") if mappings else "A"
+            )
+            for m in mappings:
+                if m.get("is_key"):
                     batch_col_letter = m.get("target_col_letter")
                     break
 
             for data in data_list:
-                batch_number = str(data.get(batch_col_letter, "N/A"))
+                batch_val = data.get(batch_col_letter)
+                if batch_val is None or str(batch_val).strip() == "":
+                    import uuid
+
+                    batch_number = f"NO_BATCH_{uuid.uuid4().hex[:6]}"
+                else:
+                    batch_number = str(batch_val).strip()
+
                 self.valid_records.append(
                     BrewRecord(batch_number=batch_number, data=data)
                 )
@@ -331,6 +378,23 @@ class TabQCCheck(QWidget):
             self.tbl_files.item(row, 0).text()
             for row in range(self.tbl_files.rowCount())
         }
+
+        new_paths = [p for p in file_paths if p not in current_files]
+        if not new_paths:
+            return
+
+        self.lbl_status.setText(f"Đang đọc danh sách sheet của {len(new_paths)} tệp...")
+        self.progress_bar.setRange(0, 0)
+        self.btn_start_scan.setEnabled(False)
+
+        self.scanner_worker = FileScannerWorker(new_paths, self)
+        self.scanner_worker.file_scanned.connect(self._on_file_scanned)
+        self.scanner_worker.finished_scan.connect(self._on_scan_finished)
+        self.scanner_worker.start()
+
+    def _on_file_scanned(
+        self, path: str, all_sheets: List[str], file_error: str
+    ) -> None:
         config_sheets_str = AppConfig().data.get("input_file", {}).get("sheet_name", "")
         config_sheets = (
             [s.strip() for s in config_sheets_str.split(",")]
@@ -338,62 +402,44 @@ class TabQCCheck(QWidget):
             else []
         )
 
+        if config_sheets:
+            selected_sheets = [s for s in all_sheets if s in config_sheets]
+            if not selected_sheets:
+                selected_sheets = all_sheets.copy()
+        else:
+            selected_sheets = all_sheets.copy()
+
+        self.file_sheet_data[path] = {
+            "all": all_sheets,
+            "selected": selected_sheets,
+        }
+
         self.tbl_files.setUpdatesEnabled(False)  # Khóa Render UI để tối ưu hiệu năng
-        for path in file_paths:
-            if path not in current_files:
-                all_sheets = []
-                file_error = ""
-                try:
-                    wb = openpyxl.load_workbook(path, read_only=True)
-                    all_sheets = [
-                        ws.title for ws in wb.worksheets if ws.sheet_state == "visible"
-                    ]
-                    wb.close()
-                except PermissionError:
-                    file_error = "Tệp đang bị khóa (có thể đang mở trên Excel)."
-                except openpyxl.utils.exceptions.InvalidFileException:
-                    file_error = "Định dạng tệp không hợp lệ."
-                except (OSError, FileNotFoundError) as e:
-                    file_error = f"Lỗi đọc tệp: {e}"
+        row_count = self.tbl_files.rowCount()
+        self.tbl_files.insertRow(row_count)
+        self.tbl_files.setItem(row_count, 0, QTableWidgetItem(path))
 
-                if config_sheets:
-                    selected_sheets = [s for s in all_sheets if s in config_sheets]
-                    if not selected_sheets:
-                        selected_sheets = all_sheets.copy()
-                else:
-                    selected_sheets = all_sheets.copy()
-
-                self.file_sheet_data[path] = {
-                    "all": all_sheets,
-                    "selected": selected_sheets,
-                }
-
-                row_count = self.tbl_files.rowCount()
-                self.tbl_files.insertRow(row_count)
-                self.tbl_files.setItem(row_count, 0, QTableWidgetItem(path))
-
-                if file_error:
-                    self.tbl_files.setItem(row_count, 1, QTableWidgetItem("N/A"))
-                    err_item = QTableWidgetItem(f"❌ Lỗi: Không thể đọc file")
-                    err_item.setForeground(QColor(COLOR_ERROR_TEXT))
-                    err_item.setToolTip(file_error)
-                    self.tbl_files.setItem(row_count, 2, err_item)
-                    self.error_map[path] = [file_error]
-                else:
-                    btn_sheets = QPushButton(
-                        f"Chọn ({len(selected_sheets)}/{len(all_sheets)})"
-                    )
-                    btn_sheets.clicked.connect(
-                        lambda checked, p=path, r=row_count: self._open_sheet_selector(
-                            p, r
-                        )
-                    )
-                    self.tbl_files.setCellWidget(row_count, 1, btn_sheets)
-                    self.tbl_files.setItem(
-                        row_count, 2, QTableWidgetItem("Chờ quét...")
-                    )
+        if file_error:
+            self.tbl_files.setItem(row_count, 1, QTableWidgetItem("N/A"))
+            err_item = QTableWidgetItem(f"❌ Lỗi: Không thể đọc file")
+            err_item.setForeground(QColor(COLOR_ERROR_TEXT))
+            err_item.setToolTip(file_error)
+            self.tbl_files.setItem(row_count, 2, err_item)
+            self.error_map[path] = [file_error]
+        else:
+            btn_sheets = QPushButton(f"Chọn ({len(selected_sheets)}/{len(all_sheets)})")
+            btn_sheets.clicked.connect(
+                lambda checked, p=path, r=row_count: self._open_sheet_selector(p, r)
+            )
+            self.tbl_files.setCellWidget(row_count, 1, btn_sheets)
+            self.tbl_files.setItem(row_count, 2, QTableWidgetItem("Chờ quét..."))
 
         self.tbl_files.setUpdatesEnabled(True)  # Mở lại Render UI sau khi chèn xong
+
+    def _on_scan_finished(self) -> None:
+        self.lbl_status.setText("Sẵn sàng kéo thả file.")
+        self.progress_bar.setRange(0, 100)
+        self.progress_bar.setValue(0)
         if self.tbl_files.rowCount() > 0:
             self.btn_start_scan.setEnabled(True)
 

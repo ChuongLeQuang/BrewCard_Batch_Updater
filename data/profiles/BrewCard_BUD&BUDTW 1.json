@@ -1,0 +1,439 @@
+{
+    "target_file": {
+        "path": "G:/TamThuy/BrewCard_Batch_Updater/data/Copy of Point map import template_1781070615921.xlsx",
+        "sheet_name": "Water (2)"
+    },
+    "input_file": {
+        "sheet_name": ""
+    },
+    "input_filter": {
+        "type": "keyword",
+        "value": "Brew"
+    },
+    "header_row": "11",
+    "fingerprint": "D2=Brand & E2=Budweiser",
+    "fallback_profile": "",
+    "mappings": [
+        {
+            "target_col": "",
+            "target_col_letter": "B",
+            "source_mapping": "J3",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "C",
+            "source_mapping": "E2",
+            "is_key": false
+        },
+        {
+            "target_col": "g/L",
+            "target_col_letter": "N",
+            "source_mapping": "BE12",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "R",
+            "source_mapping": "L15/E10",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "S",
+            "source_mapping": "I13+I14",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "T",
+            "source_mapping": "L9/(L15+E10)",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "U",
+            "source_mapping": "E20",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "V",
+            "source_mapping": "I20",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "X",
+            "source_mapping": "I22",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "Z",
+            "source_mapping": "I33",
+            "is_key": false
+        },
+        {
+            "target_col": "ppb",
+            "target_col_letter": "M",
+            "source_mapping": "H3",
+            "is_key": true
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AB",
+            "source_mapping": "I13+I14+I15",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AC",
+            "source_mapping": "L37",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AD",
+            "source_mapping": "L8/E9",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AE",
+            "source_mapping": "E40",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AF",
+            "source_mapping": "I40",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AG",
+            "source_mapping": "K41",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AH",
+            "source_mapping": "K42",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AI",
+            "source_mapping": "E43",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AJ",
+            "source_mapping": "I43",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AK",
+            "source_mapping": "I45",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AM",
+            "source_mapping": "E47",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AN",
+            "source_mapping": "I51",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AO",
+            "source_mapping": "I57",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AP",
+            "source_mapping": "E57",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AQ",
+            "source_mapping": "L55",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AR",
+            "source_mapping": "L63",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AS",
+            "source_mapping": "L64",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AT",
+            "source_mapping": "E61",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AU",
+            "source_mapping": "E60",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AV",
+            "source_mapping": "E58",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AW",
+            "source_mapping": "E59",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AX",
+            "source_mapping": "L60",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "AZ",
+            "source_mapping": "E58/E59",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "BB",
+            "source_mapping": "I59+I58",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "BC",
+            "source_mapping": "I64",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "BD",
+            "source_mapping": "L56",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "BT",
+            "source_mapping": "E72",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "BX",
+            "source_mapping": "E78",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "BY",
+            "source_mapping": "I77",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "CA",
+            "source_mapping": "I72",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "CB",
+            "source_mapping": "I78+I80",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "CC",
+            "source_mapping": "I72+I78+I80",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "CD",
+            "source_mapping": "I72+I78+I80-H72-H78-H80",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "CG",
+            "source_mapping": "I74",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "CH",
+            "source_mapping": "I75",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "CJ",
+            "source_mapping": "(E78-E84)/E78",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "CP",
+            "source_mapping": "(E66-E98-10.5)/E66",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "CQ",
+            "source_mapping": "I75",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "CR",
+            "source_mapping": "I76",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "CT",
+            "source_mapping": "L77",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "CX",
+            "source_mapping": "K83",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "CY",
+            "source_mapping": "K82+K75",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DA",
+            "source_mapping": "I84",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DB",
+            "source_mapping": "I88",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DC",
+            "source_mapping": "I88-H88",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DE",
+            "source_mapping": "D83/E98",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DG",
+            "source_mapping": "I98",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DH",
+            "source_mapping": "L98",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DI",
+            "source_mapping": "E100",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DJ",
+            "source_mapping": "E100*1000/E98",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DL",
+            "source_mapping": "E98",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DN",
+            "source_mapping": "L105",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DO",
+            "source_mapping": "L105-K105",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DP",
+            "source_mapping": "L103-K103",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DR",
+            "source_mapping": "L106",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DS",
+            "source_mapping": "L96",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DT",
+            "source_mapping": "L97",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DV",
+            "source_mapping": "D98",
+            "is_key": false
+        },
+        {
+            "target_col": "",
+            "target_col_letter": "DW",
+            "source_mapping": "E9/(E9+E10)",
+            "is_key": false
+        }
+    ],
+    "profile_name": "BrewCard_BUD&BUDTW 1"
+}

@@ -58,7 +58,26 @@ def test_e2e_happy_path(sandbox_env):
     sandbox_clean = sandbox_env["clean"]
 
     config = AppConfig()
-    config.data["target_file"]["path"] = str(sandbox_master)
+    config.data["target_file"] = {"path": str(sandbox_master), "sheet_name": "Master"}
+    config.data["fingerprint"] = ""
+    config.data["fallback_profile"] = ""
+    config.data["header_row"] = "1"
+    config.data["header_row"] = "1"
+    config.data["mappings"] = [
+        {
+            "target_col": "Batch Number",
+            "target_col_letter": "A",
+            "source_mapping": "H3",
+            "format_type": "General",
+            "is_key": True,
+        },
+        {
+            "target_col": "Data",
+            "target_col_letter": "B",
+            "source_mapping": "E10",
+            "format_type": "General",
+        },
+    ]
 
     is_valid, errors, extracted_data_list = scan_file_qc(str(sandbox_clean), config)
 
@@ -160,7 +179,22 @@ def test_e2e_dirty_path(sandbox_env):
     sandbox_dirty = sandbox_env["dirty"]
 
     config = AppConfig()
-    config.data["target_file"]["path"] = str(sandbox_master)
+    config.data["target_file"] = {"path": str(sandbox_master), "sheet_name": "Master"}
+    config.data["fingerprint"] = ""
+    config.data["fallback_profile"] = ""
+    config.data["mappings"] = [
+        {
+            "target_col": "Batch Number",
+            "target_col_letter": "A",
+            "source_mapping": "H3",
+            "is_key": True,
+        },
+        {
+            "target_col": "Error Data",
+            "target_col_letter": "B",
+            "source_mapping": "A1/0",  # Cố tình tạo lỗi chia cho 0 để đánh rớt QC
+        },
+    ]
 
     is_valid, errors, extracted_data_list = scan_file_qc(str(sandbox_dirty), config)
 
@@ -253,7 +287,10 @@ def test_e2e_update_overwrite(sandbox_env):
     sandbox_update = sandbox_env["update"]
 
     config = AppConfig()
-    config.data["target_file"]["path"] = sandbox_master
+    config.data["target_file"] = {"path": str(sandbox_master), "sheet_name": "Master"}
+    config.data["fingerprint"] = ""
+    config.data["fallback_profile"] = ""
+    config.data["header_row"] = "1"
     # Cố tình set mapping trỏ đúng vào Cột A (Số lô) để test
     config.data["mappings"] = [
         {
@@ -261,6 +298,7 @@ def test_e2e_update_overwrite(sandbox_env):
             "target_col_letter": "A",
             "source_mapping": "H3",
             "format_type": "General",
+            "is_key": True,
         },
         {
             "target_col": "Grist/Water Ratio",
@@ -284,8 +322,11 @@ def test_e2e_update_overwrite(sandbox_env):
 
     # File Master ban đầu có 1 Header + 1 Dòng dữ liệu (Lô B9999).
     # File Update cũng chứa lô B9999. Do đó max_row vẫn chỉ được phép là 2 (Không chèn dòng mới).
+    batch_count = sum(
+        1 for r in range(2, ws.max_row + 1) if ws.cell(row=r, column=1).value
+    )
     assert (
-        ws.max_row == 2
+        batch_count == 1
     ), "Lỗi nghiêm trọng: Hệ thống đẻ thêm dòng mới thay vì ghi đè dòng cũ!"
 
     # Kiểm tra xem dữ liệu có thực sự được cập nhật chưa
@@ -302,6 +343,9 @@ def test_e2e_complex_formulas(sandbox_env):
     sandbox_complex = sandbox_env["complex"]
 
     config = AppConfig()
+    config.data["fingerprint"] = ""
+    config.data["fallback_profile"] = ""
+    config.data["header_row"] = "1"
     config.data["mappings"] = [
         {
             "target_col": "Batch",
@@ -349,6 +393,7 @@ def test_e2e_wrong_fingerprint(sandbox_env):
 
     config = AppConfig()
     config.data["fingerprint"] = "D3=Order: & G3=Batch:"
+    config.data["fallback_profile"] = ""
 
     is_valid, errors, extracted = scan_file_qc(sandbox_wrong, config)
 

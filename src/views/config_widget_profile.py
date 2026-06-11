@@ -5,8 +5,6 @@ VI: Widget quản lý cấu hình Profile và File Đích.
 
 import os
 import re
-import tempfile
-import shutil
 import openpyxl
 from openpyxl.utils import get_column_letter
 from PyQt6.QtWidgets import (
@@ -45,7 +43,7 @@ class ConfigWidgetProfile(QWidget):
         # Dòng 0: Quản lý Đa cấu hình (Profiles)
         h_profile = QHBoxLayout()
         h_profile.addWidget(QLabel("📂 Hồ sơ Cấu hình (Profile):", self))
-        self.cmb_profile = QComboBox(self)
+        self.cmb_profile = NoScrollComboBox(self)
         self.cmb_profile.setEditable(True)
         h_profile.addWidget(self.cmb_profile, stretch=1)
         btn_delete_profile = QPushButton("🗑️ Xóa Profile", self)
@@ -114,13 +112,8 @@ class ConfigWidgetProfile(QWidget):
         layout_input.addLayout(h_fp1)
 
         h_fp2 = QHBoxLayout()
-        h_fp2.addWidget(
-            QLabel(
-                "🔄 Nếu không khớp, thử kiểm tra bằng Form dự phòng (phải có Vân tay riêng):",
-                self,
-            )
-        )
-        self.cmb_fallback_profile = QComboBox(self)
+        h_fp2.addWidget(QLabel("🔄 Nếu không khớp, tự động dùng Form dự phòng:", self))
+        self.cmb_fallback_profile = NoScrollComboBox(self)
         h_fp2.addWidget(self.cmb_fallback_profile, stretch=1)
         layout_input.addLayout(h_fp2)
 
@@ -137,16 +130,13 @@ class ConfigWidgetProfile(QWidget):
         )
         self.cmb_sheet_name.currentTextChanged.connect(self._refresh_headers)
         self.txt_header_row.editingFinished.connect(self._refresh_headers)
-        self.txt_target_path.editingFinished.connect(self._on_target_path_edited)
+        self.txt_target_path.editingFinished.connect(
+            lambda: self._populate_sheet_names(self.txt_target_path.text())
+        )
 
         # Cập nhật sơ đồ luồng khi đổi Combobox
         self.cmb_profile.currentTextChanged.connect(self._update_chain_preview)
         self.cmb_fallback_profile.currentTextChanged.connect(self._update_chain_preview)
-
-    def _on_target_path_edited(self):
-        path = self.txt_target_path.text().strip()
-        self._populate_sheet_names(path)
-        self._refresh_headers()
 
     def _update_chain_preview(self):
         current_prof = self.cmb_profile.currentText().strip()
@@ -157,11 +147,11 @@ class ConfigWidgetProfile(QWidget):
 
         if fallback_prof and fallback_prof != current_prof:
             self.lbl_chain_preview.setText(
-                f"👉 Luồng: Khớp vân tay [{current_prof}] ➡️ (Nếu sai) ➡️ Thử khớp vân tay [{fallback_prof}] ➡️ (Nếu vẫn sai) ➡️ ❌ Bỏ qua (Rác)"
+                f"👉 Luồng quét: Kiểm tra [{current_prof}] ➡️ (Nếu sai) ➡️ Chuyển sang [{fallback_prof}]"
             )
         else:
             self.lbl_chain_preview.setText(
-                f"👉 Luồng: Khớp vân tay [{current_prof}] ➡️ (Nếu sai) ➡️ ❌ Bỏ qua (Sheet rác)"
+                f"👉 Luồng quét: Kiểm tra [{current_prof}] ➡️ (Nếu sai) ➡️ ❌ Báo Lỗi Ngay"
             )
 
     @retry_io(retries=3, delay=1.0)
@@ -190,24 +180,23 @@ class ConfigWidgetProfile(QWidget):
         sheets = []
         if os.path.exists(file_path):
             if file_path.lower().endswith((".xlsx", ".xlsm")):
-                fd, tmp_path = tempfile.mkstemp(suffix=".xlsx")
-                os.close(fd)
+                wb = None
                 try:
-                    shutil.copy2(file_path, tmp_path)
-                    wb = self._safe_load_workbook(tmp_path, read_only=True)
+                    wb = self._safe_load_workbook(file_path)
                     sheets = wb.sheetnames
-                    wb.close()
-                except Exception as e:
+                except (
+                    openpyxl.utils.exceptions.InvalidFileException,
+                    FileNotFoundError,
+                    PermissionError,
+                ) as e:
                     QMessageBox.warning(
                         self,
                         "Lỗi đọc file",
                         f"Không thể đọc danh sách sheet.\nChi tiết lỗi: {str(e)}",
                     )
                 finally:
-                    try:
-                        os.remove(tmp_path)
-                    except OSError:
-                        pass
+                    if wb is not None:
+                        wb.close()
             elif file_path.lower().endswith((".xlsb", ".xls")):
                 QMessageBox.warning(
                     self,
@@ -245,19 +234,13 @@ class ConfigWidgetProfile(QWidget):
         if os.path.exists(target_path) and target_path.lower().endswith(
             (".xlsx", ".xlsm")
         ):
-            fd, tmp_path = tempfile.mkstemp(suffix=".xlsx")
-            os.close(fd)
+            wb = None
             try:
-                shutil.copy2(target_path, tmp_path)
-                wb = self._safe_load_workbook(tmp_path, read_only=True, data_only=True)
-
-                sheet = None
+                wb = self._safe_load_workbook(
+                    target_path, read_only=True, data_only=True
+                )
                 if sheet_name in wb.sheetnames:
                     sheet = wb[sheet_name]
-                elif wb.sheetnames:
-                    sheet = wb.active
-
-                if sheet:
                     header_dict = {}
                     for row in sheet.iter_rows(min_row=start_r, max_row=end_r):
                         for col_idx, cell in enumerate(row, start=1):
@@ -279,14 +262,16 @@ class ConfigWidgetProfile(QWidget):
                             counter += 1
                         self.available_headers[full_name] = col_letter
                         self.letter_to_name[col_letter] = full_name
-                wb.close()
-            except Exception:
+            except (
+                PermissionError,
+                openpyxl.utils.exceptions.InvalidFileException,
+                FileNotFoundError,
+                OSError,
+            ):
                 pass
             finally:
-                try:
-                    os.remove(tmp_path)
-                except OSError:
-                    pass
+                if wb is not None:
+                    wb.close()
 
         self.headers_refreshed.emit(self.letter_to_name)
 

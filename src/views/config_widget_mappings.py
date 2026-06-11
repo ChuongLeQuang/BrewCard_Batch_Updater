@@ -47,12 +47,13 @@ class ConfigWidgetMappings(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
 
         layout.addWidget(QLabel("Bản đồ ánh xạ dữ liệu (Mappings):", self))
-        self.tbl_mappings = QTableWidget(0, 5, self)
+        self.tbl_mappings = QTableWidget(0, 6, self)
         self.tbl_mappings.setHorizontalHeaderLabels(
             [
                 "Cột đích (Chữ cái)",
                 "Tên Cột đích (Tự động)",
                 "Nguồn lấy dữ liệu / Công thức Excel",
+                "🔑 Khóa Chính",
                 "Định dạng hiển thị",
                 "Xóa",
             ]
@@ -63,16 +64,19 @@ class ConfigWidgetMappings(QWidget):
         self.tbl_mappings.setColumnWidth(0, 150)
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
         header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(3, QHeaderView.ResizeMode.Interactive)
-        self.tbl_mappings.setColumnWidth(3, 180)
-        header.setSectionResizeMode(4, QHeaderView.ResizeMode.Fixed)
-        self.tbl_mappings.setColumnWidth(4, 40)
+        header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(4, QHeaderView.ResizeMode.Interactive)
+        self.tbl_mappings.setColumnWidth(4, 180)
+        header.setSectionResizeMode(5, QHeaderView.ResizeMode.Fixed)
+        self.tbl_mappings.setColumnWidth(5, 40)
         layout.addWidget(self.tbl_mappings)
 
         h_btns = QHBoxLayout()
         btn_add = QPushButton("➕ Thêm dòng ánh xạ", self)
         btn_add.clicked.connect(
-            lambda: self._add_mapping_row("", "", "", scroll_to_bottom=True)
+            lambda: self._add_mapping_row(
+                "", "", "", False, "📝 Mặc định", scroll_to_bottom=True
+            )
         )
         btn_pick = QPushButton("🎯 Mở Excel ảo chọn Ô", self)
         btn_pick.clicked.connect(self._open_excel_mockup)
@@ -88,15 +92,22 @@ class ConfigWidgetMappings(QWidget):
 
     def _on_cell_changed(self, row: int, col: int):
         item = self.tbl_mappings.item(row, col)
-        if not item or not item.text().strip():
+        if not item:
             return
 
         self.tbl_mappings.blockSignals(True)
-        if col == 2:
+        if col == 2 and item.text().strip():
             formatted = re.sub(
                 r"\s*([()*/+<>=^&,\-])\s*", r"\1", item.text().strip().upper()
             )
             item.setText(formatted)
+        elif col == 3:
+            if item.checkState() == Qt.CheckState.Checked:
+                for r in range(self.tbl_mappings.rowCount()):
+                    if r != row:
+                        other_item = self.tbl_mappings.item(r, 3)
+                        if other_item:
+                            other_item.setCheckState(Qt.CheckState.Unchecked)
         self.tbl_mappings.blockSignals(False)
 
     def update_headers(self, letter_to_name: dict):
@@ -134,6 +145,7 @@ class ConfigWidgetMappings(QWidget):
         target_col: str,
         target_letter: str,
         source_mapping: str,
+        is_key: bool = False,
         format_type: str = "📝 Mặc định",
         scroll_to_bottom: bool = False,
     ):
@@ -156,20 +168,27 @@ class ConfigWidgetMappings(QWidget):
         self.tbl_mappings.setItem(row, 1, item_name)
         self.tbl_mappings.setItem(row, 2, QTableWidgetItem(source_mapping))
 
+        item_key = QTableWidgetItem()
+        item_key.setFlags(Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
+        item_key.setCheckState(
+            Qt.CheckState.Checked if is_key else Qt.CheckState.Unchecked
+        )
+        self.tbl_mappings.setItem(row, 3, item_key)
+
         format_cmb = NoScrollComboBox(self)
         format_cmb.addItems(list(FORMAT_OPTIONS.keys()))
         if format_type and format_cmb.findText(format_type) != -1:
             format_cmb.setCurrentText(format_type)
         else:
             format_cmb.setCurrentIndex(0)
-        self.tbl_mappings.setCellWidget(row, 3, format_cmb)
+        self.tbl_mappings.setCellWidget(row, 4, format_cmb)
 
         btn_delete = QPushButton("❌", self)
         btn_delete.setStyleSheet(
             "color: red; border: none; font-size: 14px; padding: 2px;"
         )
         btn_delete.clicked.connect(lambda _, b=btn_delete: self._delete_mapping_row(b))
-        self.tbl_mappings.setCellWidget(row, 4, btn_delete)
+        self.tbl_mappings.setCellWidget(row, 5, btn_delete)
 
         cmb.currentTextChanged.connect(
             lambda text, c=cmb: self._update_target_name_by_cmb(c, text)
@@ -184,7 +203,7 @@ class ConfigWidgetMappings(QWidget):
 
     def _delete_mapping_row(self, btn: QPushButton):
         for row in range(self.tbl_mappings.rowCount()):
-            if self.tbl_mappings.cellWidget(row, 4) == btn:
+            if self.tbl_mappings.cellWidget(row, 5) == btn:
                 self.tbl_mappings.removeRow(row)
                 break
 
@@ -310,7 +329,7 @@ class ConfigWidgetMappings(QWidget):
 
                 if found_r != -1:
                     self.tbl_mappings.item(found_r, 2).setText(formula)
-                    cmb = self.tbl_mappings.cellWidget(found_r, 3)
+                    cmb = self.tbl_mappings.cellWidget(found_r, 4)
                     if (
                         isinstance(cmb, QComboBox)
                         and cmb.currentText() == "📝 Mặc định"
@@ -324,7 +343,9 @@ class ConfigWidgetMappings(QWidget):
                         if normalize_name(v) == norm_target:
                             best_letter = k
                             break
-                    self._add_mapping_row(target_name, best_letter, formula, fmt, True)
+                    self._add_mapping_row(
+                        target_name, best_letter, formula, False, fmt, True
+                    )
                     imported_count += 1
 
             exact_matches, pending_aliases, skipped_count = process_import_mappings(
@@ -392,11 +413,16 @@ class ConfigWidgetMappings(QWidget):
     def load_mappings(self, mappings: list):
         self.tbl_mappings.setUpdatesEnabled(False)
         self.tbl_mappings.setRowCount(0)
-        for m in mappings:
+        has_key = any(m.get("is_key", False) for m in mappings)
+        for i, m in enumerate(mappings):
+            is_k = m.get("is_key", False)
+            if not has_key and i == 0:
+                is_k = True
             self._add_mapping_row(
                 m.get("target_col", ""),
                 m.get("target_col_letter", ""),
                 m.get("source_mapping", ""),
+                is_k,
                 m.get("format_type", "📝 Mặc định"),
             )
         self.tbl_mappings.setUpdatesEnabled(True)
@@ -410,7 +436,11 @@ class ConfigWidgetMappings(QWidget):
             )
             tc_item = self.tbl_mappings.item(row, 1)
             src_item = self.tbl_mappings.item(row, 2)
-            format_cmb = self.tbl_mappings.cellWidget(row, 3)
+            key_item = self.tbl_mappings.item(row, 3)
+
+            is_k = key_item.checkState() == Qt.CheckState.Checked if key_item else False
+
+            format_cmb = self.tbl_mappings.cellWidget(row, 4)
             format_type = (
                 format_cmb.currentText()
                 if isinstance(format_cmb, QComboBox)
@@ -422,6 +452,7 @@ class ConfigWidgetMappings(QWidget):
                     "target_col": tc_item.text().strip() if tc_item else "",
                     "target_col_letter": tcl,
                     "source_mapping": src_item.text().strip() if src_item else "",
+                    "is_key": is_k,
                     "format_type": format_type,
                 }
             )

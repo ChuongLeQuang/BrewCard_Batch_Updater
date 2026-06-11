@@ -13,6 +13,12 @@ __pycache__/
 logs/
 output/
 
+# Bỏ qua các file Excel data nặng để tránh cảnh báo GitHub
+data/*.xlsx
+data/*.xlsm
+data/*.xlsb
+data/*.csv
+
 # Build & Packaging
 dist/
 build/

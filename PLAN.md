@@ -210,3 +210,10 @@ Bộ phân dịch `ExcelFormulaEvaluator` sẽ tuân thủ các quy tắc sau:
 - **20/05/2026 (Update 1)**: Tổng kiểm tra dự án. Nhận diện nợ kỹ thuật và lên kế hoạch Giai đoạn 3.
 - **20/05/2026 (Update 2)**: Hoàn thành Giai đoạn 3 (Sửa lỗi toán tử %, Tái cấu trúc chuẩn Clean Code, Bổ sung Unit Test đạt 61/61).
 - **21/05/2026**: Lên kế hoạch Giai đoạn 4 - Bước 12 (Tính năng Quản lý Định dạng Hiển thị Dữ liệu).
+- **25/06/2026**: Khắc phục lỗi lệch dòng Excel, sửa lỗi năm nhuận Excel 1900, chuyển sang cập nhật/chèn tại chỗ và bổ sung tính năng tự động backup an toàn trước khi ghi.
+- **25/06/2026 (Update 1)**: Thêm tính năng tự động và thủ công sắp xếp bảng ánh xạ dữ liệu (Mappings) theo đúng thứ tự cột của Excel (A-Z, AA-ZZ).
+- **25/06/2026 (Update 2)**: Cải tiến toàn diện hộp thoại Hướng dẫn sử dụng & Công thức (Guide Dialog), viết lại tài liệu từng bước chi tiết và đẹp mắt bằng CSS Cards, sửa lỗi phím tắt mnemonic cho nút bấm hướng dẫn.
+- **25/06/2026 (Update 3)**: Rà soát và viết lại toàn bộ nội dung hướng dẫn chi tiết từng bước, làm rõ các thuật ngữ kỹ thuật (Profile, Vân tay, Mapping, QC, Backup), hỗ trợ giao diện sáng/tối linh hoạt và mở rộng kích thước hộp thoại để đảm bảo tính dễ dùng tối đa cho người mới.
+- **25/06/2026 (Update 4)**: Thiết kế bộ giao diện phẳng hiện đại chuẩn Windows 11 Fluent UI bằng QSS (Qt Style Sheets) tích hợp trực tiếp vào tệp quản lý giao diện, bo tròn góc, cải tiến Tab Bar với thanh trượt Pivot và thiết kế thanh cuộn dẹt tinh tế, vượt qua toàn bộ kiểm thử thành công.
+
+

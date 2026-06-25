@@ -3,6 +3,7 @@ EN: Worker threads for background processing.
 VI: Các luồng chạy ngầm để xử lý tác vụ nền.
 """
 
+import os
 from PyQt6.QtCore import QThread, pyqtSignal
 from typing import List, Dict, Any
 
@@ -65,7 +66,11 @@ class SyncWorker(QThread):
             engine = BrewSyncEngine(self.config)
             success = engine.sync_records(self.records)
             if success:
-                self.finished.emit(True, "Đồng bộ dữ liệu thành công!")
+                msg = f"Đồng bộ dữ liệu thành công cho {len(self.records)} mẻ nấu!"
+                if engine.last_backup_path:
+                    backup_file_name = os.path.basename(engine.last_backup_path)
+                    msg += f"\n\n🛡️ Bản sao lưu an toàn đã được tự động tạo tại:\ndata/backups/{backup_file_name}"
+                self.finished.emit(True, msg)
             else:
                 self.finished.emit(
                     False, "Đồng bộ thất bại. Vui lòng kiểm tra lại file đích."

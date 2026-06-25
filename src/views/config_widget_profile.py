@@ -57,9 +57,11 @@ class ConfigWidgetProfile(QWidget):
         # Khung 1: Thiết lập File Tổng (Master File)
         grp_master = QGroupBox("📦 1. Thiết lập File Tổng (Nơi dồn dữ liệu vào)", self)
         grp_master.setStyleSheet(
-            "QGroupBox { font-weight: bold; color: #2A82DA; border: 1px solid #aaa; margin-top: 10px; } QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 5px; }"
+            "QGroupBox { font-weight: bold; color: #2A82DA; border: 1px solid #2A82DA; border-radius: 6px; margin-top: 12px; background-color: rgba(42, 130, 218, 0.03); } "
+            "QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 5px; }"
         )
         layout_master = QVBoxLayout(grp_master)
+        layout_master.setContentsMargins(12, 18, 12, 12)
 
         h_target = QHBoxLayout()
         h_target.addWidget(QLabel("Tệp Excel Đích:", self))
@@ -87,9 +89,11 @@ class ConfigWidgetProfile(QWidget):
             "🤖 2. Tự động Nhận diện File Con (Kéo thả ở Tab QC)", self
         )
         grp_input.setStyleSheet(
-            "QGroupBox { font-weight: bold; color: #E67E22; border: 1px solid #aaa; margin-top: 10px; } QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 5px; }"
+            "QGroupBox { font-weight: bold; color: #E67E22; border: 1px solid #E67E22; border-radius: 6px; margin-top: 12px; background-color: rgba(230, 126, 34, 0.03); } "
+            "QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 5px; }"
         )
         layout_input = QVBoxLayout(grp_input)
+        layout_input.setContentsMargins(12, 18, 12, 12)
 
         h_in_sheet = QHBoxLayout()
         h_in_sheet.addWidget(QLabel("Tên Sheet lấy dữ liệu:", self))

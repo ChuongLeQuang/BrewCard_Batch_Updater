@@ -31,7 +31,6 @@ Nếu bạn đã khởi tạo kèm `.venv`, hãy kích hoạt nó bằng lệnh 
 ```text
 📦 BrewCard_Batch_Updater
     ┣ 📜 .env.example
-    ┣ 📜 .env
     ┣ 📜 scan_architecture.py
     ┣ 📜 auto_checks.py
     ┣ 📜 .dockerignore
@@ -101,6 +100,7 @@ Nếu bạn đã khởi tạo kèm `.venv`, hãy kích hoạt nó bằng lệnh 
         ┣ 📜 test_e2e_workflow.py
         ┣ 📜 test_excel_services.py
         ┣ 📜 test_formula_parser.py
+        ┣ 📜 test_config_widget_mappings.py
         ┣ 📂 test_data
             ┣ 📜 mock_input_batch.xlsx
             ┣ 📜 mock_input_clean.xlsx
@@ -127,6 +127,7 @@ Nếu bạn đã khởi tạo kèm `.venv`, hãy kích hoạt nó bằng lệnh 
             ┣ 📜 BrewCard_FormOld.json
             ┣ 📜 BrewCard_BUD&BUDTW 1.json
             ┣ 📜 BrewCard_FormNew.json
+        ┣ 📂 backups
     ┣ 📂 .github
         ┣ 📂 workflows
             ┣ 📜 build.yml
@@ -183,6 +184,7 @@ Nếu bạn đã khởi tạo kèm `.venv`, hãy kích hoạt nó bằng lệnh 
 | `tests/test_alias_memory.py` | Kiểm thử mô hình bộ nhớ ghép nối cột. |
 | `tests/test_BrewCard_Batch_Updater.py` | Chưa có mô tả chi tiết. |
 | `tests/test_config_model.py` | Kiểm thử đơn vị cho mô hình dữ liệu cấu hình ứng dụng. |
+| `tests/test_config_widget_mappings.py` | Kiểm thử đơn vị cho logic sắp xếp cột Excel trong lưới Mapping. |
 | `tests/test_e2e_workflow.py` | Kiểm thử tích hợp toàn trình (E2E) trong môi trường Hộp cát (Sandbox). |
 | `tests/test_excel_services.py` | Kiểm thử đơn vị cho các dịch vụ xử lý Excel. |
 | `tests/test_formula_parser.py` | Các bài kiểm thử đơn vị cho bộ phân dịch công thức Excel. |
@@ -390,9 +392,18 @@ Phần này trích xuất tự động thông tin về Đầu vào (Inputs) và 
   - **`def _find_batch_column() -> str`**
     > EN: Find the primary key column (Explicitly marked by user).
     > VI: Lấy chữ cái của cột Khóa chính (Được người dùng tích chọn).
+  - **`def _backup_master_file() -> str`**
+    > EN: Automatically backup the master file before overwriting.
+    > VI: Tự động sao lưu tệp đích trước khi thực hiện ghi đè.
+  - **`def _find_row_by_batch(ws, col_idx: int, batch_num: str) -> Optional[int]`**
+    > EN: Find row index by batch number.
+    > VI: Dò tìm chỉ số dòng dựa trên số mẻ nấu (khóa chính).
+  - **`def _find_next_empty_row(ws, col_idx: int) -> int`**
+    > EN: Find next empty row for inserting new record, checking for safety.
+    > VI: Tìm dòng trống tiếp theo để chèn mẻ nấu mới, có kiểm tra an toàn.
   - **`def sync_records(records: List[BrewRecord]) -> bool`**
-    > EN: Sync records into the target master file (Insert/Update/Sort).
-    > VI: Đồng bộ danh sách dữ liệu vào file tổng (Thêm mới/Cập nhật/Sắp xếp).
+    > EN: Sync records into the target master file (Insert/Update in-place).
+    > VI: Đồng bộ danh sách dữ liệu vào file tổng (Thêm mới/Cập nhật tại chỗ).
 
 
 #### 📄 `src/utils/core_utils.py`
@@ -472,6 +483,10 @@ Phần này trích xuất tự động thông tin về Đầu vào (Inputs) và 
     > EN: Apply dark palette. VI: Áp dụng bảng màu tối.
   - **`def _apply_light_theme(app: QApplication) -> None`**
     > EN: Reset to default light palette. VI: Khôi phục bảng màu sáng mặc định.
+  - **`def _get_dark_qss() -> str`**
+    > Chưa có mô tả.
+  - **`def _get_light_qss() -> str`**
+    > Chưa có mô tả.
 
 
 #### 📄 `src/views/config_dialog_alias.py`
@@ -517,6 +532,12 @@ Phần này trích xuất tự động thông tin về Đầu vào (Inputs) và 
     > Chưa có mô tả.
   - **`def get_mappings() -> list`**
     > Chưa có mô tả.
+  - **`def _sort_mappings_list(mappings: list) -> list`**
+    > EN: Sort mappings list alphabetically by target_col_letter (A-Z, AA-ZZ).
+    > VI: Sắp xếp danh sách ánh xạ theo thứ tự chữ cái của cột đích.
+  - **`def sort_and_refresh_ui() -> Any`**
+    > EN: Sort current mappings and refresh table widget.
+    > VI: Sắp xếp bảng ánh xạ hiện tại và vẽ lại giao diện.
 
 
 #### 📄 `src/views/config_widget_profile.py`
@@ -584,6 +605,12 @@ Phần này trích xuất tự động thông tin về Đầu vào (Inputs) và 
     > EN: Setup the menu bar for themes. VI: Thiết lập thanh thực đơn chuyển đổi giao diện.
   - **`def _change_theme(mode: str) -> None`**
     > Chưa có mô tả.
+  - **`def _load_window_size() -> None`**
+    > EN: Load saved window size. VI: Tải kích thước cửa sổ đã lưu.
+  - **`def _save_window_size() -> None`**
+    > EN: Save current window size. VI: Lưu kích thước cửa sổ hiện tại.
+  - **`def closeEvent(event) -> None`**
+    > EN: Save window size when closed. VI: Lưu kích thước cửa sổ khi đóng.
 
 
 #### 📄 `src/views/tab_config_system.py`
@@ -746,6 +773,14 @@ Phần này trích xuất tự động thông tin về Đầu vào (Inputs) và 
   > EN: Test retrieving all profiles. VI: Kiểm thử lấy danh sách toàn bộ hồ sơ.
 
 
+#### 📄 `tests/test_config_widget_mappings.py`
+**Functions:**
+
+- **`def test_config_widget_mappings_sorting() -> Any`**
+  > EN: Test that ConfigWidgetMappings automatically sorts mapping rows by Excel column order.
+  > VI: Kiểm thử ConfigWidgetMappings tự động sắp xếp các dòng ánh xạ theo đúng thứ tự cột Excel.
+
+
 #### 📄 `tests/test_e2e_workflow.py`
 **Functions:**
 
@@ -793,7 +828,7 @@ Phần này trích xuất tự động thông tin về Đầu vào (Inputs) và 
 - **`def test_scan_file_success(tmp_path, mock_config) -> Any`**
   > Chưa có mô tả.
 
-- **`def test_sync_engine_insert_update_sort(tmp_path, mock_config) -> Any`**
+- **`def test_sync_engine_insert_update(tmp_path, mock_config) -> Any`**
   > Chưa có mô tả.
 
 - **`def test_normalize_name() -> Any`**
@@ -805,6 +840,14 @@ Phần này trích xuất tự động thông tin về Đầu vào (Inputs) và 
 
 - **`def test_sanitize_formula() -> Any`**
   > EN: Test cleaning formulas. VI: Kiểm thử làm sạch công thức.
+
+- **`def test_sync_engine_inplace_update_preserves_other_columns(tmp_path, mock_config) -> Any`**
+  > EN: Test that in-place updates preserve unmapped columns.
+  > VI: Kiểm thử đồng bộ tại chỗ giữ nguyên các cột phụ không có trong mapping.
+
+- **`def test_sync_engine_auto_backup(tmp_path, mock_config) -> Any`**
+  > EN: Test that sync engine automatically backs up target file before writing.
+  > VI: Kiểm thử cơ chế tự động sao lưu tệp đích trước khi ghi đè.
 
 
 #### 📄 `tests/test_formula_parser.py`
@@ -829,5 +872,9 @@ Phần này trích xuất tự động thông tin về Đầu vào (Inputs) và 
 
 - **`def test_formula_errors(evaluator: ExcelFormulaEvaluator, formula: str, expected_error_str: str) -> Any`**
   > EN: Tests formulas that should return error strings. VI: Kiểm thử các công thức trả về chuỗi lỗi.
+
+- **`def test_excel_date_leap_year_correction(evaluator: ExcelFormulaEvaluator) -> Any`**
+  > EN: Test Excel 1900 leap year bug correction in _to_num.
+  > VI: Kiểm thử sửa lỗi năm nhuận Excel 1900 trong hàm _to_num.
 
 <!-- ARCHITECTURE_END -->

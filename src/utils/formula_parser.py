@@ -5,7 +5,7 @@ VI: Bộ phân dịch và tính toán công thức Excel.
 
 import re
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from typing import Any, List
 from openpyxl.worksheet.worksheet import Worksheet
 
@@ -93,9 +93,15 @@ class ExcelFormulaEvaluator:
 
     def _to_num(self, val: Any) -> float:
         """EN: Safe cast to float (handles Excel Date). VI: Ép kiểu an toàn sang số."""
-        if isinstance(val, datetime):
+        if isinstance(val, (datetime, date)):
+            if not isinstance(val, datetime):
+                val = datetime(val.year, val.month, val.day)
             delta = val - datetime(1899, 12, 30)
-            return delta.total_seconds() / 86400.0
+            days = delta.total_seconds() / 86400.0
+            if days < 61.0:
+                # Trước ngày 01/03/1900, Excel đếm thiếu 1 ngày do lỗi năm nhuận 1900
+                return days - 1.0
+            return days
         if isinstance(val, bool):
             return 1.0 if val else 0.0
         if val is None or val == "":

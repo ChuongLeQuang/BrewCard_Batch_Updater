@@ -35,25 +35,6 @@ class TabConfigSystem(QWidget):
         """EN: Initialize the UI layout. VI: Khởi tạo bố cục giao diện."""
         layout = QVBoxLayout(self)
 
-        # Khung Hướng dẫn sử dụng (Help Box)
-        frm_help = QFrame(self)
-        frm_help.setStyleSheet(
-            "QFrame { background-color: rgba(42, 130, 218, 0.1); border: 1px solid #2A82DA; border-radius: 5px; }"
-        )
-        h_help = QHBoxLayout(frm_help)
-        lbl_help = QLabel(
-            "💡 <b>HƯỚNG DẪN CẤU HÌNH (Chỉ thiết lập 1 lần):</b><br>"
-            "Khai báo Tệp Đích để tổng hợp dữ liệu, thiết lập Tệp Đầu vào và xây dựng Bản đồ ánh xạ dữ liệu (Mappings).",
-            self,
-        )
-        lbl_help.setStyleSheet("border: none; background: transparent;")
-        h_help.addWidget(lbl_help, stretch=1)
-
-        btn_show_guide = QPushButton("📖 Xem chi tiết Hướng dẫn & Công thức", self)
-        btn_show_guide.clicked.connect(lambda: GuideDialog(self).exec())
-        h_help.addWidget(btn_show_guide)
-        layout.addWidget(frm_help)
-
         # Khối Giao diện cấu hình Profile
         self.widget_profile = ConfigWidgetProfile(self)
         layout.addWidget(self.widget_profile)

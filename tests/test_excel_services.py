@@ -74,7 +74,7 @@ def test_scan_file_success(tmp_path, mock_config):
     assert data["C"] == 200  # Đã qua Formula Parser tính toán
 
 
-def test_sync_engine_insert_update_sort(tmp_path, mock_config):
+def test_sync_engine_insert_update(tmp_path, mock_config):
     engine = BrewSyncEngine(mock_config)
     records = [
         BrewRecord(batch_number="B002", data={"A": "B002", "B": 200, "C": 400}),
@@ -90,7 +90,8 @@ def test_sync_engine_insert_update_sort(tmp_path, mock_config):
     wb = openpyxl.load_workbook(target_path)
     ws = wb["Master"]
     assert ws["A1"].value == "Batch"  # Tự động tạo Header nếu file trống
-    assert ws["A2"].value == "B001"  # Tự động Sắp xếp tăng dần
+    assert ws["A2"].value == "B002"  # Được nạp trước, ghi ở dòng 2
+    assert ws["A3"].value == "B001"  # Được nạp sau, ghi ở dòng 3
     assert ws["C2"].number_format == "0.00%"  # Kiểm tra format được áp dụng
     wb.close()
 
@@ -138,3 +139,116 @@ def test_sanitize_formula():
     assert sanitize_formula("'[Data 2025.xlsx]Sheet 1'!A1") == "A1"
     assert sanitize_formula("=A1+B1") == "A1+B1"
     assert sanitize_formula(None) == ""
+
+
+def test_sync_engine_inplace_update_preserves_other_columns(tmp_path, mock_config):
+    """
+    EN: Test that in-place updates preserve unmapped columns.
+    VI: Kiểm thử đồng bộ tại chỗ giữ nguyên các cột phụ không có trong mapping.
+    """
+    # Cấu hình khóa chính cho Mapping
+    mock_config.data["mappings"][0]["is_key"] = True
+
+    target_path = mock_config.data["target_file"]["path"]
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Master"
+    ws["A1"] = "Batch"
+    ws["B1"] = "Value"
+    ws["C1"] = "Calc"
+    ws["D1"] = "Extra1"
+    ws["E1"] = "Extra2"
+
+    ws["A2"] = "B001"
+    ws["B2"] = 10
+    ws["C2"] = 20
+    ws["D2"] = "Ghi chú B001"
+    ws["E2"] = "Nháp B001"
+
+    ws["A3"] = "B003"
+    ws["B3"] = 30
+    ws["C3"] = 60
+    ws["D3"] = "Ghi chú B003"
+    ws["E3"] = "Nháp B003"
+
+    wb.save(target_path)
+    wb.close()
+
+    engine = BrewSyncEngine(mock_config)
+    records = [
+        BrewRecord(batch_number="B002", data={"A": "B002", "B": 200, "C": 400}),
+    ]
+
+    success = engine.sync_records(records)
+    assert success is True
+
+    wb = openpyxl.load_workbook(target_path)
+    ws = wb["Master"]
+
+    # Tìm dòng của từng mẻ để assert chính xác, độc lập với việc nó ghi ở dòng mấy
+    row_b001 = None
+    row_b002 = None
+    row_b003 = None
+
+    for r in range(2, ws.max_row + 1):
+        val = ws.cell(row=r, column=1).value
+        if val == "B001":
+            row_b001 = r
+        elif val == "B002":
+            row_b002 = r
+        elif val == "B003":
+            row_b003 = r
+
+    assert row_b001 is not None
+    assert row_b002 is not None
+    assert row_b003 is not None
+
+    # Mẻ B001 giữ nguyên giá trị mapping và cột phụ
+    assert ws.cell(row=row_b001, column=2).value == 10
+    assert ws.cell(row=row_b001, column=4).value == "Ghi chú B001"
+    assert ws.cell(row=row_b001, column=5).value == "Nháp B001"
+
+    # Mẻ B003 giữ nguyên giá trị mapping và cột phụ
+    assert ws.cell(row=row_b003, column=2).value == 30
+    assert ws.cell(row=row_b003, column=4).value == "Ghi chú B003"
+    assert ws.cell(row=row_b003, column=5).value == "Nháp B003"
+
+    # Mẻ B002 mới cập nhật đúng dữ liệu mapping và có cột phụ trống
+    assert ws.cell(row=row_b002, column=2).value == 200
+    assert ws.cell(row=row_b002, column=4).value is None
+    assert ws.cell(row=row_b002, column=5).value is None
+
+    wb.close()
+
+
+def test_sync_engine_auto_backup(tmp_path, mock_config):
+    """
+    EN: Test that sync engine automatically backs up target file before writing.
+    VI: Kiểm thử cơ chế tự động sao lưu tệp đích trước khi ghi đè.
+    """
+    target_path = mock_config.data["target_file"]["path"]
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Master"
+    ws["A1"] = "Batch"
+    ws["A2"] = "B001"
+    wb.save(target_path)
+    wb.close()
+
+    engine = BrewSyncEngine(mock_config)
+    records = [BrewRecord(batch_number="B002", data={"A": "B002", "B": 200, "C": 400})]
+    success = engine.sync_records(records)
+    assert success is True
+
+    backup_dir = "data/backups"
+    assert os.path.exists(backup_dir)
+    backups = os.listdir(backup_dir)
+    assert len(backups) > 0
+    assert any("TestProfile" in b and b.endswith(".xlsx") for b in backups)
+
+    # Dọn dẹp backup
+    for b in backups:
+        try:
+            os.remove(os.path.join(backup_dir, b))
+        except OSError:
+            pass

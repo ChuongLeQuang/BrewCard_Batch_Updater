@@ -157,3 +157,25 @@ def test_formula_errors(
 ):
     """EN: Tests formulas that should return error strings. VI: Kiểm thử các công thức trả về chuỗi lỗi."""
     assert evaluator.evaluate(formula) == expected_error_str
+
+
+def test_excel_date_leap_year_correction(evaluator: ExcelFormulaEvaluator):
+    """
+    EN: Test Excel 1900 leap year bug correction in _to_num.
+    VI: Kiểm thử sửa lỗi năm nhuận Excel 1900 trong hàm _to_num.
+    """
+    from datetime import datetime
+
+    evaluator.worksheet = create_mock_sheet(
+        {
+            "A1": datetime(1900, 3, 1),
+            "A2": datetime(2023, 1, 1),
+            "A3": datetime(1900, 1, 1),
+        }
+    )
+    # Ngày 01/03/1900 phải là 61.0 trong Excel
+    assert evaluator._to_num(evaluator._get_cell_value("A1")) == 61.0
+    # Ngày 01/01/2023 phải là 44927.0 trong Excel
+    assert evaluator._to_num(evaluator._get_cell_value("A2")) == 44927.0
+    # Ngày 01/01/1900 phải là 1.0 trong Excel
+    assert evaluator._to_num(evaluator._get_cell_value("A3")) == 1.0

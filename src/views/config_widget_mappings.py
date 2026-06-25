@@ -19,8 +19,10 @@ from PyQt6.QtWidgets import (
     QDialog,
     QFileDialog,
     QInputDialog,
+    QGroupBox,
 )
 from PyQt6.QtCore import Qt
+from openpyxl.utils import column_index_from_string
 from src.views.widget_noscroll_combobox import NoScrollComboBox
 from src.views.widget_excel_mockup import WidgetExcelMockup
 from src.views.config_dialog_alias import AliasMappingDialog
@@ -46,7 +48,14 @@ class ConfigWidgetMappings(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
 
-        layout.addWidget(QLabel("Bản đồ ánh xạ dữ liệu (Mappings):", self))
+        grp_mappings = QGroupBox("🗺️ 3. Bản đồ ánh xạ dữ liệu (Mappings)", self)
+        grp_mappings.setStyleSheet(
+            "QGroupBox { font-weight: bold; color: #28A745; border: 1px solid #28A745; border-radius: 6px; margin-top: 12px; background-color: rgba(40, 167, 69, 0.03); } "
+            "QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 5px; }"
+        )
+        layout_mappings = QVBoxLayout(grp_mappings)
+        layout_mappings.setContentsMargins(12, 18, 12, 12)
+
         self.tbl_mappings = QTableWidget(0, 6, self)
         self.tbl_mappings.setHorizontalHeaderLabels(
             [
@@ -69,7 +78,7 @@ class ConfigWidgetMappings(QWidget):
         self.tbl_mappings.setColumnWidth(4, 180)
         header.setSectionResizeMode(5, QHeaderView.ResizeMode.Fixed)
         self.tbl_mappings.setColumnWidth(5, 40)
-        layout.addWidget(self.tbl_mappings)
+        layout_mappings.addWidget(self.tbl_mappings)
 
         h_btns = QHBoxLayout()
         btn_add = QPushButton("➕ Thêm dòng ánh xạ", self)
@@ -83,10 +92,15 @@ class ConfigWidgetMappings(QWidget):
         btn_import = QPushButton("🔄 Nạp Công thức từ File...", self)
         btn_import.setStyleSheet("color: #E67E22; font-weight: bold;")
         btn_import.clicked.connect(self._import_formulas_from_file)
+        btn_sort = QPushButton("🧹 Sắp xếp A-Z", self)
+        btn_sort.clicked.connect(self.sort_and_refresh_ui)
         h_btns.addWidget(btn_add)
         h_btns.addWidget(btn_pick)
         h_btns.addWidget(btn_import)
-        layout.addLayout(h_btns)
+        h_btns.addWidget(btn_sort)
+        layout_mappings.addLayout(h_btns)
+
+        layout.addWidget(grp_mappings)
 
         self.tbl_mappings.cellChanged.connect(self._on_cell_changed)
 
@@ -413,8 +427,12 @@ class ConfigWidgetMappings(QWidget):
     def load_mappings(self, mappings: list):
         self.tbl_mappings.setUpdatesEnabled(False)
         self.tbl_mappings.setRowCount(0)
-        has_key = any(m.get("is_key", False) for m in mappings)
-        for i, m in enumerate(mappings):
+
+        # Tự động sắp xếp trước khi hiển thị
+        sorted_mappings = self._sort_mappings_list(mappings)
+
+        has_key = any(m.get("is_key", False) for m in sorted_mappings)
+        for i, m in enumerate(sorted_mappings):
             is_k = m.get("is_key", False)
             if not has_key and i == 0:
                 is_k = True
@@ -456,4 +474,30 @@ class ConfigWidgetMappings(QWidget):
                     "format_type": format_type,
                 }
             )
-        return mappings
+        # Tự động sắp xếp trước khi trả về
+        return self._sort_mappings_list(mappings)
+
+    def _sort_mappings_list(self, mappings: list) -> list:
+        """
+        EN: Sort mappings list alphabetically by target_col_letter (A-Z, AA-ZZ).
+        VI: Sắp xếp danh sách ánh xạ theo thứ tự chữ cái của cột đích.
+        """
+
+        def get_col_index(item):
+            letter = item.get("target_col_letter", "").strip().upper()
+            if not letter:
+                return 999999  # Đẩy các dòng chưa có cột đích xuống cuối cùng
+            try:
+                return column_index_from_string(letter)
+            except ValueError:
+                return 999999
+
+        return sorted(mappings, key=get_col_index)
+
+    def sort_and_refresh_ui(self):
+        """
+        EN: Sort current mappings and refresh table widget.
+        VI: Sắp xếp bảng ánh xạ hiện tại và vẽ lại giao diện.
+        """
+        current_mappings = self.get_mappings()
+        self.load_mappings(current_mappings)

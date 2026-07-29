@@ -12,13 +12,13 @@
         {
             "label": "🛡️ Chạy Kiểm Tra Tự Động (Auto Checks)",
             "type": "shell",
-            "command": "python auto_checks.py",
+            "command": ".venv\\Scripts\\python.exe auto_checks.py",
             "problemMatcher": []
         },
         {
             "label": "🚀 Build Executable (.exe)",
             "type": "shell",
-            "command": "python build.py",
+            "command": ".venv\\Scripts\\python.exe build.py",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -28,13 +28,13 @@
         {
             "label": "🔍 Cập nhật Architecture (README.md)",
             "type": "shell",
-            "command": "python scan_architecture.py",
+            "command": ".venv\\Scripts\\python.exe scan_architecture.py",
             "problemMatcher": []
         },
         {
             "label": "🧪 Chạy Unit Test (pytest)",
             "type": "shell",
-            "command": "pytest",
+            "command": ".venv\\Scripts\\pytest.exe",
             "problemMatcher": []
         },
         {

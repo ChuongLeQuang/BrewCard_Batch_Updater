@@ -30,122 +30,125 @@ Nếu bạn đã khởi tạo kèm `.venv`, hãy kích hoạt nó bằng lệnh 
 ### 🌳 Cây Thư Mục
 ```text
 📦 BrewCard_Batch_Updater
-    ┣ 📜 .env.example
-    ┣ 📜 scan_architecture.py
-    ┣ 📜 auto_checks.py
-    ┣ 📜 .dockerignore
-    ┣ 📜 Dockerfile
-    ┣ 📜 docker-compose.yml
-    ┣ 📜 LICENSE
-    ┣ 📜 sync.bat
     ┣ 📜 check.bat
+    ┣ 📜 auto_checks.py
     ┣ 📜 build.bat
-    ┣ 📜 init_github.bat
-    ┣ 📜 pytest.ini
-    ┣ 📜 .gitignore
-    ┣ 📜 AI_RULES.md
-    ┣ 📜 PLAN.md
-    ┣ 📜 README.md
+    ┣ 📜 LICENSE
     ┣ 📜 build.py
     ┣ 📜 generate_mocks.py
     ┣ 📜 main.py
-    ┣ 📜 migrate_json.py
-    ┣ 📜 relink_github.bat
-    ┣ 📜 requirements.txt
+    ┣ 📜 sync.bat
+    ┣ 📜 pytest.ini
+    ┣ 📜 .dockerignore
+    ┣ 📜 PLAN.md
+    ┣ 📜 scan_architecture.py
+    ┣ 📜 .gitignore
     ┣ 📜 version.txt
-    ┣ 📂 src
-        ┣ 📜 __init__.py
-        ┣ 📂 models
-            ┣ 📜 __init__.py
-            ┣ 📜 config_model.py
-            ┣ 📜 excel_data_model.py
-            ┣ 📜 alias_memory.py
-        ┣ 📂 services
-            ┣ 📜 __init__.py
-            ┣ 📜 excel_reader_service.py
-            ┣ 📜 excel_sync_service.py
-        ┣ 📂 utils
-            ┣ 📜 __init__.py
-            ┣ 📜 retry_example.py
-            ┣ 📜 theme_manager.py
-            ┣ 📜 qc_logger.py
-            ┣ 📜 core_utils.py
-            ┣ 📜 formula_parser.py
-        ┣ 📂 controllers
-            ┣ 📜 __init__.py
-            ┣ 📜 worker_threads.py
-        ┣ 📂 config
-            ┣ 📜 __init__.py
-            ┣ 📜 constants.py
-        ┣ 📂 exceptions
-            ┣ 📜 __init__.py
-            ┣ 📜 custom_exceptions.py
-        ┣ 📂 views
-            ┣ 📜 tab_sync_data.py
-            ┣ 📜 main_window.py
-            ┣ 📜 widget_excel_mockup.py
-            ┣ 📜 widget_noscroll_combobox.py
-            ┣ 📜 config_widget_profile.py
-            ┣ 📜 __init__.py
-            ┣ 📜 config_dialog_alias.py
-            ┣ 📜 config_widget_mappings.py
-            ┣ 📜 dialog_column_selector.py
-            ┣ 📜 dialog_guide.py
-            ┣ 📜 tab_config_system.py
-            ┣ 📜 tab_qc_check.py
-    ┣ 📂 tests
-        ┣ 📜 test_BrewCard_Batch_Updater.py
-        ┣ 📜 test_alias_memory.py
-        ┣ 📜 test_config_model.py
-        ┣ 📜 test_e2e_workflow.py
-        ┣ 📜 test_excel_services.py
-        ┣ 📜 test_formula_parser.py
-        ┣ 📜 test_config_widget_mappings.py
-        ┣ 📂 test_data
-            ┣ 📜 mock_input_batch.xlsx
-            ┣ 📜 mock_input_clean.xlsx
-            ┣ 📜 mock_input_clean_update.xlsx
-            ┣ 📜 mock_input_complex_formulas.xlsx
-            ┣ 📜 mock_input_dirty.xlsx
-            ┣ 📜 mock_input_dirty_wrong_form.xlsx
-            ┣ 📜 mock_master.xlsx
-    ┣ 📂 logs
-        ┣ 📜 qc_errors_20260518_183915.txt
-        ┣ 📜 qc_errors_20260518_184008.txt
-        ┣ 📜 qc_errors_20260518_185159.txt
-    ┣ 📂 output
-        ┣ 📜 E2E_Dirty_Path_Result.xlsx
-        ┣ 📜 E2E_Happy_Path_Result.xlsx
-    ┣ 📂 data
-        ┣ 📜 Dot Graph Syn from BrewCard 2026.xlsx
-        ┣ 📜 BUD18P-027-029-W04-CCT14.xlsm
-        ┣ 📜 app_settings.json
-        ┣ 📜 BUD Brewcard sync.xlsx
-        ┣ 📜 Copy of Point map import template_1781070615921.xlsx
-        ┣ 📜 Test.xlsx
-        ┣ 📂 profiles
-            ┣ 📜 BrewCard_FormOld.json
-            ┣ 📜 BrewCard_BUD&BUDTW 1.json
-            ┣ 📜 BrewCard_FormNew.json
-        ┣ 📂 backups
+    ┣ 📜 init_github.bat
+    ┣ 📜 AI_RULES.md
+    ┣ 📜 Dockerfile
+    ┣ 📜 docker-compose.yml
+    ┣ 📜 README.md
+    ┣ 📜 relink_github.bat
+    ┣ 📜 .env.example
+    ┣ 📜 migrate_json.py
+    ┣ 📜 requirements.txt
+    ┣ 📂 .pytest_cache
+        ┣ 📜 .gitignore
+        ┣ 📜 CACHEDIR.TAG
+        ┣ 📜 README.md
+        ┣ 📂 v
+            ┣ 📂 cache
+                ┣ 📜 lastfailed
+                ┣ 📜 nodeids
     ┣ 📂 .github
         ┣ 📂 workflows
             ┣ 📜 build.yml
-    ┣ 📂 .pytest_cache
-        ┣ 📜 README.md
-        ┣ 📜 .gitignore
-        ┣ 📜 CACHEDIR.TAG
-        ┣ 📂 v
-            ┣ 📂 cache
-                ┣ 📜 nodeids
-                ┣ 📜 lastfailed
+    ┣ 📂 tests
+        ┣ 📜 test_e2e_workflow.py
+        ┣ 📜 test_excel_services.py
+        ┣ 📜 test_alias_memory.py
+        ┣ 📜 test_config_model.py
+        ┣ 📜 test_formula_parser.py
+        ┣ 📜 test_config_widget_mappings.py
+        ┣ 📜 test_BrewCard_Batch_Updater.py
+        ┣ 📂 test_data
+            ┣ 📜 mock_input_dirty_wrong_form.xlsx
+            ┣ 📜 mock_input_dirty.xlsx
+            ┣ 📜 mock_input_complex_formulas.xlsx
+            ┣ 📜 mock_input_clean_update.xlsx
+            ┣ 📜 mock_input_batch.xlsx
+            ┣ 📜 mock_input_clean.xlsx
+            ┣ 📜 mock_master.xlsx
     ┣ 📂 assets
         ┣ 📜 icon3.png
         ┣ 📜 icon4.png
-        ┣ 📜 icon1.png
         ┣ 📜 icon.ico
         ┣ 📜 icon.png
         ┣ 📜 icon0.png
+        ┣ 📜 icon1.png
+    ┣ 📂 data
+        ┣ 📜 BUD18P-027-029-W04-CCT14.xlsm
+        ┣ 📜 Copy of Point map import template_1781070615921.xlsx
+        ┣ 📜 Dot Graph Syn from BrewCard 2026.xlsx
+        ┣ 📜 Test.xlsx
+        ┣ 📜 BUSCH Brew sync.xlsm
+        ┣ 📜 Dot Graph Syn from BrewCard 2026.xlsb
+        ┣ 📜 BUD Brewcard sync.xlsx
+        ┣ 📜 Dot Graph Syn from BrewCard 2025.xlsb
+        ┣ 📜 app_settings.json
+        ┣ 📂 profiles
+            ┣ 📜 BrewCard_FormOld.json
+            ┣ 📜 BrewCard_FormNew.json
+            ┣ 📜 BrewCard_BUD&BUDTW 1.json
+        ┣ 📂 backups
+    ┣ 📂 output
+        ┣ 📜 E2E_Happy_Path_Result.xlsx
+        ┣ 📜 E2E_Dirty_Path_Result.xlsx
+    ┣ 📂 logs
+        ┣ 📜 qc_errors_20260518_184008.txt
+        ┣ 📜 qc_errors_20260518_183915.txt
+        ┣ 📜 qc_errors_20260518_185159.txt
+    ┣ 📂 src
+        ┣ 📜 __init__.py
+        ┣ 📂 services
+            ┣ 📜 excel_sync_service.py
+            ┣ 📜 __init__.py
+            ┣ 📜 excel_reader_service.py
+        ┣ 📂 models
+            ┣ 📜 excel_data_model.py
+            ┣ 📜 __init__.py
+            ┣ 📜 alias_memory.py
+            ┣ 📜 config_model.py
+        ┣ 📂 views
+            ┣ 📜 tab_sync_data.py
+            ┣ 📜 widget_noscroll_combobox.py
+            ┣ 📜 main_window.py
+            ┣ 📜 config_widget_profile.py
+            ┣ 📜 widget_excel_mockup.py
+            ┣ 📜 tab_qc_check.py
+            ┣ 📜 dialog_column_selector.py
+            ┣ 📜 tab_config_system.py
+            ┣ 📜 __init__.py
+            ┣ 📜 config_widget_mappings.py
+            ┣ 📜 config_dialog_alias.py
+            ┣ 📜 dialog_guide.py
+        ┣ 📂 utils
+            ┣ 📜 qc_logger.py
+            ┣ 📜 __init__.py
+            ┣ 📜 theme_manager.py
+            ┣ 📜 formula_parser.py
+            ┣ 📜 core_utils.py
+            ┣ 📜 retry_example.py
+        ┣ 📂 controllers
+            ┣ 📜 worker_threads.py
+            ┣ 📜 __init__.py
+        ┣ 📂 exceptions
+            ┣ 📜 __init__.py
+            ┣ 📜 custom_exceptions.py
+        ┣ 📂 config
+            ┣ 📜 __init__.py
+            ┣ 📜 constants.py
 ```
 ### 🧩 Chi Tiết Modules (Tổng quan)
 
@@ -550,6 +553,8 @@ Phần này trích xuất tự động thông tin về Đầu vào (Inputs) và 
   - **`def _setup_ui() -> Any`**
     > Chưa có mô tả.
   - **`def _setup_connections() -> Any`**
+    > Chưa có mô tả.
+  - **`def _on_profile_index_changed(index: int) -> Any`**
     > Chưa có mô tả.
   - **`def _update_chain_preview() -> Any`**
     > Chưa có mô tả.

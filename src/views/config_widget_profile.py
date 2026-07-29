@@ -129,9 +129,7 @@ class ConfigWidgetProfile(QWidget):
         layout.addWidget(grp_input)
 
     def _setup_connections(self):
-        self.cmb_profile.currentIndexChanged.connect(
-            lambda: self.profile_changed.emit(self.cmb_profile.currentText().strip())
-        )
+        self.cmb_profile.currentIndexChanged.connect(self._on_profile_index_changed)
         self.cmb_sheet_name.currentTextChanged.connect(self._refresh_headers)
         self.txt_header_row.editingFinished.connect(self._refresh_headers)
         self.txt_target_path.editingFinished.connect(
@@ -141,6 +139,14 @@ class ConfigWidgetProfile(QWidget):
         # Cập nhật sơ đồ luồng khi đổi Combobox
         self.cmb_profile.currentTextChanged.connect(self._update_chain_preview)
         self.cmb_fallback_profile.currentTextChanged.connect(self._update_chain_preview)
+
+    def _on_profile_index_changed(self, index: int):
+        # Chỉ tải cấu hình khi chọn một profile hợp lệ từ danh sách (index >= 0).
+        # Tránh tải lại làm mất dữ liệu giao diện khi người dùng đang gõ tên profile mới (index = -1).
+        if index >= 0:
+            profile_name = self.cmb_profile.itemText(index).strip()
+            if profile_name:
+                self.profile_changed.emit(profile_name)
 
     def _update_chain_preview(self):
         current_prof = self.cmb_profile.currentText().strip()
